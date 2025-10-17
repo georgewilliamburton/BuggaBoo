@@ -28,15 +28,10 @@
     <div class="main-area">
         <!-- Left Toolbar -->
         <div class="left-toolbar">
-            <button class="tool-btn active" id="draw-tool" onclick="setTool('draw')" title="Draw">✏️</button>
+            <!-- Tool Menu Order: Draw (D key), Select (S key), Fill (F key), Eraser -->
             <button class="tool-btn" id="select-tool" onclick="setTool('select')" title="Select">👆</button>
-            <button class="tool-btn" id="fill-tool" onclick="setTool('fill')" title="Fill">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
-                    <path d="M17 12c0 1.66-1.34 3-3 3s-3-1.34-3-3c0-1.31.84-2.41 2-2.83V6h2v3.17c1.16.42 2 1.52 2 2.83z"/>
-                    <path d="M12 18l-3-3h6z"/>
-                </svg>
-            </button>
+            <button class="tool-btn active" id="draw-tool" onclick="setTool('draw')" title="Draw">✏️</button>
+            <button class="tool-btn" id="fill-tool" onclick="setTool('fill')" title="Fill">🎨</button>
             <button class="tool-btn" id="eraser-tool" onclick="setTool('eraser')" title="Eraser">🧹</button>
         </div>
 
