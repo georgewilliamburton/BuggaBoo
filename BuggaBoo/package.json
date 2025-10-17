@@ -17,6 +17,7 @@
   "build": {
     "appId": "com.buggaboo.studio",
     "productName": "BuggaBoo Studio",
+    "asar": false,
     "directories": {
       "output": "dist"
     },

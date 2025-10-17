@@ -12,7 +12,7 @@ function createWindow () {
     }
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Optionally remove menu for a cleaner app-like look
   Menu.setApplicationMenu(null);
