@@ -2,9 +2,6 @@
 // Initializes the application when the page loads
 
 function initializeApp() {
-    // Show canvas size selection modal on startup
-    showCanvasSizeModal();
-    
     // Set initial brush size colors to black
     updateBrushSizeColors();
     
@@ -13,6 +10,17 @@ function initializeApp() {
     
     // Initialize assets system
     initializeAssets();
+    
+    // Start auto-save system
+    startAutoSave();
+    
+    // Check for previous session to restore
+    const hasAutoSave = loadAutoSavedProject();
+    
+    // If no auto-save, show canvas size selection modal
+    if (!hasAutoSave) {
+        showCanvasSizeModal();
+    }
     
     console.log('Animation Maker initialized!');
 }

@@ -34,10 +34,10 @@ function initializeKeyboardShortcuts() {
             e.preventDefault();
             selectAllObjects();
         }
-        // Ctrl/Cmd + S for save frame
+        // Ctrl/Cmd + S for save project
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
-            saveFrame();
+            saveProject();
         }
         // S key for select tool
         if (e.key === 's' && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
