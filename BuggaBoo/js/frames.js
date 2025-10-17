@@ -265,10 +265,10 @@ function loadFrame(index, isAutoPlayback = false) {
     }
 }
 
-// Export animation
+// Export animation as GIF
 function exportAnimation() {
     if (frames.length === 0) {
-        alert('No frames to export! Draw something and click "Save Frame" first.');
+        showInfoModal('Nothing to Export', '❌ No frames to export! Draw something and save frames first.', '❌');
         return;
     }
 
@@ -277,16 +277,83 @@ function exportAnimation() {
         saveFrame();
     }
 
-    const message = `Exporting ${frames.length} frame${frames.length > 1 ? 's' : ''}...\n\nFrames will download as PNG images.\nUse ezgif.com or similar to create a GIF!`;
-    
-    if (!confirm(message)) return;
+    // Show progress modal
+    showInfoModal('Creating GIF', '⏳ Creating your animated GIF...\nThis may take a moment.', '🎨');
 
-    frames.forEach((frame, index) => {
-        setTimeout(() => {
-            const link = document.createElement('a');
-            link.download = `frame-${String(index + 1).padStart(3, '0')}.png`;
-            link.href = frame.thumbnail; // Use thumbnail from new frame format
-            link.click();
-        }, index * 100);
-    });
+    // Small delay to ensure modal shows
+    setTimeout(() => {
+        createAnimatedGIF();
+    }, 100);
 }
+
+function createAnimatedGIF() {
+    try {
+        // Create GIF encoder
+        const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            width: canvas.width,
+            height: canvas.height,
+            workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+        });
+
+        // Add each frame to the GIF
+        frames.forEach((frame, index) => {
+            const img = new Image();
+            img.src = frame.thumbnail;
+            
+            img.onload = function() {
+                // Create a temporary canvas to draw the image
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const ctx = tempCanvas.getContext('2d');
+                
+                // Draw white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                
+                // Draw the frame
+                ctx.drawImage(img, 0, 0);
+                
+                // Add frame to GIF with delay (200ms = 5 FPS by default)
+                gif.addFrame(tempCanvas, {delay: 200, copy: true});
+                
+                // If this is the last frame, render the GIF
+                if (index === frames.length - 1) {
+                    renderGIF(gif);
+                }
+            };
+        });
+
+    } catch (error) {
+        console.error('Error creating GIF:', error);
+        showInfoModal('Export Error', '❌ Could not create GIF. Please try again.', '❌');
+    }
+}
+
+function renderGIF(gif) {
+    gif.on('finished', function(blob) {
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        a.download = `buggaboo-animation-${timestamp}.gif`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show success message
+        showInfoModal('GIF Created!', `✅ Your animated GIF has been saved!\n📊 ${frames.length} frames at 5 FPS`, '🎉');
+    });
+
+    gif.on('progress', function(progress) {
+        console.log('GIF creation progress:', Math.round(progress * 100) + '%');
+    });
+
+    // Start rendering
+    gif.render();
+}
+
