@@ -17,10 +17,13 @@ function createWindow () {
   // Optionally remove menu for a cleaner app-like look
   Menu.setApplicationMenu(null);
 
-  // Open devtools when in development (optional)
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.webContents.openDevTools();
-  }
+  // Open devtools to debug issues
+  mainWindow.webContents.openDevTools();
+  
+  // Log any errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Failed to load:', errorCode, errorDescription);
+  });
 }
 
 app.whenReady().then(() => {
