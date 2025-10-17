@@ -71,8 +71,12 @@ function addNewFrame() {
 function loadFrameFromJSON(frameData, callback) {
     canvas.loadFromJSON(frameData.json, function() {
         canvas.renderAll();
-        updateOnionSkin(); // Refresh onion skin for the new frame
-        if (callback) callback();
+        
+        // Wait a tick for canvas to fully render, then update onion skin
+        requestAnimationFrame(() => {
+            updateOnionSkin(); // Refresh onion skin for the new frame
+            if (callback) callback();
+        });
     });
 }
 

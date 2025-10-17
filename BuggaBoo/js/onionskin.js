@@ -8,6 +8,8 @@ let onionSkinOpacity = 0.3; // 30% opacity for ghost frames
 function toggleOnionSkin() {
     onionSkinEnabled = !onionSkinEnabled;
     
+    console.log('Onion skin toggled:', onionSkinEnabled, 'Current frame:', currentFrame, 'Total frames:', frames.length);
+    
     const button = document.getElementById('onion-skin-toggle');
     if (onionSkinEnabled) {
         button.classList.add('active');
@@ -21,6 +23,7 @@ function toggleOnionSkin() {
 // Show the onion skin overlay
 function showOnionSkin() {
     if (!canvas || frames.length === 0) {
+        hideOnionSkin(); // Clear any existing overlay
         return; // No frames to show
     }
     
@@ -36,27 +39,38 @@ function showOnionSkin() {
         previousFrameIndex = currentFrame - 1;
     } else {
         // First frame - no previous frame to show
+        hideOnionSkin(); // Clear any existing overlay
         return;
     }
     
     if (previousFrameIndex >= 0 && frames[previousFrameIndex]) {
         const previousFrame = frames[previousFrameIndex];
         
-        // Load the previous frame's thumbnail as a background overlay
-        fabric.Image.fromURL(previousFrame.thumbnail, function(img) {
-            // Set opacity for ghost effect
-            img.set({
-                opacity: onionSkinOpacity,
-                selectable: false,
-                evented: false,
-                excludeFromExport: true
-            });
-            
-            // Add as overlay (behind all objects but visible)
-            canvas.setOverlayImage(img, canvas.renderAll.bind(canvas), {
-                opacity: onionSkinOpacity
+        // First clear any existing overlay to prevent ghosting
+        canvas.setOverlayImage(null, function() {
+            // Load the previous frame's thumbnail as a background overlay
+            fabric.Image.fromURL(previousFrame.thumbnail, function(img) {
+                if (!img) {
+                    console.error('Failed to load onion skin image');
+                    return;
+                }
+                
+                // Set opacity for ghost effect
+                img.set({
+                    opacity: onionSkinOpacity,
+                    selectable: false,
+                    evented: false,
+                    excludeFromExport: true
+                });
+                
+                // Add as overlay (behind all objects but visible)
+                canvas.setOverlayImage(img, canvas.renderAll.bind(canvas), {
+                    opacity: onionSkinOpacity
+                });
             });
         });
+    } else {
+        hideOnionSkin(); // No valid previous frame
     }
 }
 
