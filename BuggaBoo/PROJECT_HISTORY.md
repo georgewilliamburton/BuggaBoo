@@ -81,30 +81,62 @@
 - Comic Sans font for playful, child-friendly feel
 - Text shadows for depth
 
+### Phase 10: Fullscreen Canvas
+- Added fullscreen canvas size option
+- Calculates maximum available space automatically
+- Uses deterministic calculation (window size - toolbars - padding)
+- Consistent behavior on every load
+- Perfect for tablet drawing with maximum space
+
+### Phase 11: Onion Skinning
+- Added onion skin toggle button (🧅) in left toolbar
+- Shows previous frame as 30% opacity ghost overlay
+- Persists across frame changes when enabled
+- Essential animation tool for maintaining consistency
+- Handles unsaved frames intelligently
+
+### Phase 12: Asset Library System
+- Assets dropdown menu in top menu bar
+- Save Selection: Save selected object(s) as reusable asset
+- View Library: Modal with grid of saved assets
+- localStorage persistence - survives page refresh
+- Click asset to add to canvas (centered and editable)
+- Delete assets with confirmation
+- Custom naming for each asset
+- Thumbnail generation for preview
+
+### Phase 13: Additional Features
+- Ctrl+A: Select all objects on canvas
+- Automatically switches to select tool
+- Perfect for bulk operations and asset creation
+
 ## Technical Architecture
 
 ### File Structure
 ```
 BuggaBoo/
-├── index.html (192 lines) - Main HTML structure
+├── index.html (230+ lines) - Main HTML structure
 ├── css/
-│   ├── styles.css (616 lines) - Main styling
-│   └── modal.css (142 lines) - Modal dialogs
+│   ├── styles.css (705+ lines) - Main styling, dropdown menus
+│   └── modal.css (270+ lines) - Modal dialogs, assets grid
 └── js/
-    ├── canvas.js (239 lines) - Canvas setup, undo/redo
-    ├── tools.js (80 lines) - Drawing tools
-    ├── frames.js (258 lines) - Frame management
+    ├── canvas.js (245 lines) - Canvas setup, undo/redo
+    ├── tools.js (110 lines) - Drawing tools, select all
+    ├── frames.js (264 lines) - Frame management
+    ├── onionskin.js (95 lines) - Onion skin feature
+    ├── assets.js (240 lines) - Asset library system
     ├── layers.js (360 lines) - Layers panel
-    ├── ui.js (85 lines) - UI interactions, modals
-    ├── shortcuts.js (65 lines) - Keyboard shortcuts
-    └── init.js (23 lines) - App initialization
+    ├── ui.js (103 lines) - UI interactions, modals
+    ├── shortcuts.js (75 lines) - Keyboard shortcuts
+    └── init.js (27 lines) - App initialization
 ```
 
 ### Key Technologies
 - **Fabric.js 5.3.0** - Canvas manipulation library
 - **HTML5 Canvas API** - Drawing and rendering
 - **HTML5 Drag-and-Drop API** - Layer reordering
-- **Git** - Version control (9 commits total)
+- **localStorage** - Asset persistence
+- **Git** - Version control (17+ commits total)
 
 ### Data Structures
 
@@ -118,6 +150,18 @@ frames = [
 ]
 ```
 
+#### Asset Storage
+```javascript
+assets = [
+  {
+    id: 1234567890,     // Timestamp ID
+    name: 'My Asset',   // User-defined name
+    json: {...},        // Fabric.js object JSON
+    thumbnail: 'data:image/png...',  // 150x150 preview
+    created: '2025-10-17T...'  // ISO timestamp
+  }
+]
+```
 #### Undo Stack
 ```javascript
 undoStack = ['json1', 'json2', ...];  // Canvas states as JSON strings
@@ -151,6 +195,16 @@ redoStack = ['json1', 'json2', ...];  // Redo states
 **Cause:** Missing `position: relative` on parent, `left: -280px` initial position  
 **Solution:** Set `.main-area { position: relative }` and start panel at `left: -280px`
 
+### 6. Fullscreen Canvas Inconsistent Size
+**Problem:** Fullscreen sometimes small/misaligned, inconsistent on first load  
+**Cause:** Measuring DOM elements before layout fully settled  
+**Solution:** Use deterministic calculation with fixed toolbar widths + measured heights
+
+### 7. Onion Skin Disappears on New Frame
+**Problem:** Onion skin turned off when adding new frame  
+**Cause:** canvas.clear() removed overlay, timing of updateOnionSkin()  
+**Solution:** Added setTimeout delay and improved frame index logic for unsaved frames
+
 ## Design Decisions
 
 ### Why JSON + Thumbnail?
@@ -181,6 +235,19 @@ redoStack = ['json1', 'json2', ...];  // Redo states
 - **Wide:** 768×384 (Orange) - Ultra-wide
 - **Large:** 640×640 (Teal) - Bigger square
 - **YouTube:** 1280×720 (Pink) - HD video format
+- **Fullscreen:** Auto-calculated (Dark Gray) - Maximum available space
+
+## Keyboard Shortcuts
+- **D** - Draw tool
+- **S** - Select tool
+- **F** - Fill tool
+- **L** - Toggle layers panel
+- **Space** - Add new frame
+- **Shift+Space** - Duplicate current frame
+- **Ctrl+Z** - Undo
+- **Ctrl+Shift+Z / Ctrl+Y** - Redo
+- **Ctrl+S** - Save frame
+- **Ctrl+A** - Select all objects
 
 ## Color Palette
 **Interface Colors:**
@@ -197,18 +264,24 @@ redoStack = ['json1', 'json2', ...];  // Redo states
 
 ## Known Limitations
 1. **Fill Undo:** Filling an object right after creation treats it as one undo action (considered acceptable)
-2. **No Asset Library:** Planned for Phase 2, foundation laid with layers system
-3. **Export Format:** Individual PNG files only (requires external tool for GIF creation)
+2. **Export Format:** Individual PNG files only (requires external tool for GIF creation)
 
-## Future Enhancements (Planned)
-1. **Assets Library:** Save/reuse groups of objects
-2. **Property-Level Undo:** More granular undo for individual property changes
-3. **Shape Tools:** Built-in rectangle, circle, line tools
-4. **Text Tool:** Add text to animations
-5. **Onion Skinning:** See previous/next frames while drawing
-6. **GIF Export:** Built-in GIF creation from frames
+## Future Enhancements (Completed!)
+1. ✅ **Assets Library:** Save/reuse groups of objects - IMPLEMENTED Phase 12
+2. ✅ **Onion Skinning:** See previous/next frames while drawing - IMPLEMENTED Phase 11
+3. ✅ **Fullscreen Canvas:** Maximum drawing space - IMPLEMENTED Phase 10
 
-## Git Commit History
+## Future Enhancements (Potential)
+1. **Property-Level Undo:** More granular undo for individual property changes
+2. **Shape Tools:** Built-in rectangle, circle, line tools
+3. **Text Tool:** Add text to animations
+4. **GIF Export:** Built-in GIF creation from frames
+5. **Audio Sync:** Add sound effects or music to animations
+6. **Brush Customization:** Custom brush shapes and patterns
+7. **Import Images:** Add photos/images to canvas
+8. **Onion Skin Next Frame:** Show next frame too (forward and backward)
+
+## Git Commit History (Latest)
 1. `bc9dba4` - Initial commit with basic canvas
 2. `3d42c8a` - Add frame management features
 3. `f0a5a01` - Fix duplicate/delete bugs
@@ -221,25 +294,43 @@ redoStack = ['json1', 'json2', ...];  // Redo states
 10. `9627be9` - Add fill tool
 11. `23086cb` - Add complete layers panel with drag-and-drop
 12. `856366a` - Add BuggaBoo Studio logo
+13. `33643d2` - Add comprehensive project history documentation
+14. `260575c` - Add reliable fullscreen canvas size option
+15. `ed05ae9` - Add onion skin feature for animation reference
+16. `dbf4ac7` - Fix onion skin persistence when adding new frames
+17. `ffcf706` - Add asset library system for reusable objects
+18. `c48c3c0` - Add Ctrl+A shortcut to select all objects
+
+**Total Commits:** 18+
+8. `4ef1033` - Remove canvas size bar
+9. `69ae33c` - Replace fill icon with emoji
+10. `9627be9` - Add fill tool
+11. `23086cb` - Add complete layers panel with drag-and-drop
+12. `856366a` - Add BuggaBoo Studio logo
 
 ## Development Notes
 
 ### For Future Sessions
-- All features fully functional as of commit `856366a`
+- All features fully functional as of commit `c48c3c0`
 - Code is modular and well-organized
 - CSS uses BEM-like naming conventions
 - JavaScript files are purpose-separated
 - Git history preserves all major changes
+- localStorage used for assets (persistent across sessions)
 
 ### Testing Checklist
-- [ ] Draw on all canvas sizes - coordinates align
-- [ ] Duplicate frame preserves individual objects
-- [ ] Undo/redo works for all operations
-- [ ] Layers drag-and-drop reorders correctly
-- [ ] Delete layer can be undone
-- [ ] Fill tool colors objects
-- [ ] Keyboard shortcuts work
-- [ ] Export creates PNG files
+- [x] Draw on all canvas sizes - coordinates align
+- [x] Duplicate frame preserves individual objects
+- [x] Undo/redo works for all operations
+- [x] Layers drag-and-drop reorders correctly
+- [x] Delete layer can be undone
+- [x] Fill tool colors objects
+- [x] Keyboard shortcuts work
+- [x] Export creates PNG files
+- [x] Fullscreen canvas sizes correctly
+- [x] Onion skin persists across frames
+- [x] Assets save and load properly
+- [x] Ctrl+A selects all objects
 
 ## Contact & Context
 - **User:** Father creating tool for 7-year-old autistic daughter
@@ -253,6 +344,16 @@ redoStack = ['json1', 'json2', ...];  // Redo states
 - `toJSON()` / `loadFromJSON()` for state serialization
 - `insertAt()` more reliable than `moveTo()` for reordering
 - Event system: `object:added`, `object:modified`, `object:removed`
+- Canvas coordinates must match pixel dimensions (no CSS scaling)
+- `ActiveSelection` for multi-object selection
+- `setOverlayImage()` for non-interactive background layers (onion skin)
+- `fabric.util.enlivenObjects()` to restore objects from JSON
+
+### localStorage Usage
+- Assets stored with key: `buggaboo_assets`
+- JSON.stringify/parse for serialization
+- Survives page refresh and browser restart
+- Try-catch for error handling
 - Canvas coordinates must match pixel dimensions (no CSS scaling)
 
 ### HTML5 Drag-and-Drop
