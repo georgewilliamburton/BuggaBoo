@@ -11,7 +11,7 @@ body {
     background: #31A2F2;
     height: 100vh;
     display: grid;
-    grid-template-rows: auto 1fr 145px;
+    grid-template-rows: auto 1fr auto auto;
     overflow: hidden;
 }
 
@@ -499,33 +499,24 @@ body {
     cursor: pointer;
 }
 
-/* Bottom Frames Strip */
-.frames-strip {
-    background: #2c3e50;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    padding-bottom: 5px;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-    position: relative;
-}
-
-/* Playback Controls */
-.playback-controls {
+/* Playback Controls Bar (Between Canvas and Frames) */
+.playback-controls-bar {
+    background: #34495e;
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 10px;
-    padding: 0 10px;
+    justify-content: center;
+    gap: 20px;
+    padding: 12px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .playback-btn {
-    background: #34495e;
+    background: #2c3e50;
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 8px 20px;
-    font-size: 20px;
+    padding: 10px 24px;
+    font-size: 24px;
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -548,22 +539,20 @@ body {
 .speed-control {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex: 1;
+    gap: 12px;
 }
 
 .speed-label {
     color: #ecf0f1;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 #speed-slider {
-    flex: 1;
-    max-width: 200px;
+    width: 200px;
     height: 6px;
     border-radius: 3px;
-    background: #34495e;
+    background: #2c3e50;
     outline: none;
     -webkit-appearance: none;
 }
@@ -571,12 +560,13 @@ body {
 #speed-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: #E06F8B;
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 #speed-slider::-webkit-slider-thumb:hover {
@@ -585,13 +575,14 @@ body {
 }
 
 #speed-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: #E06F8B;
     cursor: pointer;
     border: none;
     transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 #speed-slider::-moz-range-thumb:hover {
@@ -601,38 +592,25 @@ body {
 
 .speed-value {
     color: #E06F8B;
-    font-size: 13px;
-    font-weight: 600;
-    min-width: 60px;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 65px;
+    text-align: center;
 }
 
-.frames-container-inner {
+/* Bottom Frames Strip */
+.frames-strip {
+    background: #2c3e50;
+    display: flex;
+    padding: 15px;
+    padding-bottom: 5px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
     overflow-x: auto;
     overflow-y: hidden;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     scroll-behavior: smooth;
-}
-
-/* Fun Brush Ninja-style scrollbar */
-.frames-container-inner::-webkit-scrollbar {
-    height: 12px;
-}
-
-.frames-container-inner::-webkit-scrollbar-track {
-    background: #1a252f;
-    border-radius: 10px;
-    margin: 0 10px;
-}
-
-.frames-container-inner::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #E06F8B, #F39C12);
-    border-radius: 10px;
-    border: 2px solid #1a252f;
-    transition: all 0.3s;
-}
-
-.frames-container-inner::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, #F39C12, #E06F8B);
-    transform: scaleY(1.2);
 }
 
 .frames-container-inner {

@@ -112,16 +112,18 @@
         </div>
     </div>
 
+    <!-- Playback Controls (Between Canvas and Frames) -->
+    <div class="playback-controls-bar">
+        <button class="playback-btn" id="play-btn" onclick="togglePlayback()" title="Play Animation">▶️</button>
+        <div class="speed-control">
+            <label class="speed-label">Speed:</label>
+            <input type="range" id="speed-slider" min="1" max="10" value="5" oninput="updatePlaybackSpeed(this.value)">
+            <span class="speed-value" id="speed-value">5 FPS</span>
+        </div>
+    </div>
+
     <!-- Bottom Frames Strip -->
     <div class="frames-strip">
-        <div class="playback-controls">
-            <button class="playback-btn" id="play-btn" onclick="togglePlayback()" title="Play Animation">▶️</button>
-            <div class="speed-control">
-                <label class="speed-label">Speed:</label>
-                <input type="range" id="speed-slider" min="1" max="10" value="5" oninput="updatePlaybackSpeed(this.value)">
-                <span class="speed-value" id="speed-value">5 FPS</span>
-            </div>
-        </div>
         <div class="frames-container-inner" id="frames-container">
             <!-- Frames will be added here dynamically -->
             <button class="add-frame-btn" onclick="addNewFrame()" title="Add Frame">+</button>
