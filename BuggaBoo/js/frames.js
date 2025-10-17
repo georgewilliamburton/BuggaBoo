@@ -277,8 +277,18 @@ function exportAnimation() {
         saveFrame();
     }
 
-    // Show progress modal
-    showInfoModal('Creating GIF', '⏳ Creating your animated GIF...\nThis may take a moment.', '🎨');
+    // Show progress modal (without OK button yet)
+    const infoModal = document.getElementById('info-modal');
+    const infoTitle = document.getElementById('info-title');
+    const infoMessage = document.getElementById('info-message');
+    const infoEmoji = document.getElementById('info-emoji');
+    const infoOkBtn = document.getElementById('info-ok-btn');
+    
+    infoTitle.textContent = 'Creating GIF';
+    infoMessage.textContent = '⏳ Loading frames...';
+    infoEmoji.textContent = '🎨';
+    infoOkBtn.style.display = 'none'; // Hide OK button during processing
+    infoModal.style.display = 'flex';
 
     // Small delay to ensure modal shows
     setTimeout(() => {
@@ -288,6 +298,9 @@ function exportAnimation() {
 
 function createAnimatedGIF() {
     try {
+        // Get modal elements for progress updates
+        const infoMessage = document.getElementById('info-message');
+        
         // Create GIF encoder
         const gif = new GIF({
             workers: 2,
@@ -322,12 +335,14 @@ function createAnimatedGIF() {
                 // Add frame to GIF with delay (200ms = 5 FPS by default)
                 gif.addFrame(tempCanvas, {delay: 200, copy: true});
                 
-                // Increment counter
+                // Increment counter and update progress
                 loadedFrames++;
+                infoMessage.textContent = `⏳ Loading frames... ${loadedFrames}/${totalFrames}`;
                 console.log(`Loaded frame ${loadedFrames}/${totalFrames}`);
                 
                 // If all frames are loaded, render the GIF
                 if (loadedFrames === totalFrames) {
+                    infoMessage.textContent = '🎨 Rendering GIF...\nThis may take a few moments.';
                     console.log('All frames loaded, rendering GIF...');
                     renderGIF(gif);
                 }
@@ -336,9 +351,11 @@ function createAnimatedGIF() {
             img.onerror = function() {
                 console.error(`Failed to load frame ${index}`);
                 loadedFrames++;
+                infoMessage.textContent = `⏳ Loading frames... ${loadedFrames}/${totalFrames}`;
                 
                 // Still try to render if this was the last frame
                 if (loadedFrames === totalFrames) {
+                    infoMessage.textContent = '🎨 Rendering GIF...';
                     renderGIF(gif);
                 }
             };
@@ -351,6 +368,14 @@ function createAnimatedGIF() {
 }
 
 function renderGIF(gif) {
+    const infoMessage = document.getElementById('info-message');
+    
+    gif.on('progress', function(progress) {
+        const percent = Math.round(progress * 100);
+        infoMessage.textContent = `🎨 Rendering GIF... ${percent}%`;
+        console.log('GIF creation progress:', percent + '%');
+    });
+
     gif.on('finished', function(blob) {
         // Create download link
         const url = URL.createObjectURL(blob);
@@ -363,12 +388,8 @@ function renderGIF(gif) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        // Show success message
+        // Show success message with OK button
         showInfoModal('GIF Created!', `✅ Your animated GIF has been saved!\n📊 ${frames.length} frames at 5 FPS`, '🎉');
-    });
-
-    gif.on('progress', function(progress) {
-        console.log('GIF creation progress:', Math.round(progress * 100) + '%');
     });
 
     // Start rendering
