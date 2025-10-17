@@ -181,8 +181,21 @@ function updateFramesDisplay() {
 
 // Duplicate current frame
 function duplicateCurrentFrame() {
+    console.log('=== DUPLICATE FRAME DEBUG ===');
+    console.log('Before duplicate - currentFrame:', currentFrame, 'frames.length:', frames.length);
+    
     // Force canvas to render before capturing current state
     canvas.renderAll();
+    
+    // IMPORTANT: If we're on an existing frame, save it first to the frames array
+    // This ensures the frames array is up to date before we duplicate
+    if (currentFrame >= 0 && currentFrame < frames.length) {
+        console.log('Updating existing frame', currentFrame, 'before duplicating');
+        frames[currentFrame] = {
+            json: canvas.toJSON(),
+            thumbnail: canvas.toDataURL('image/png')
+        };
+    }
     
     // Save current canvas state as the new duplicated frame (with JSON and thumbnail)
     const frameData = {
@@ -193,8 +206,11 @@ function duplicateCurrentFrame() {
     // Add it as a new frame (don't overwrite the existing one)
     frames.push(frameData);
     
+    console.log('After duplicate - frames.length:', frames.length);
+    
     // Move to the new duplicated frame
     currentFrame = frames.length - 1;
+    console.log('Moved to frame:', currentFrame);
     
     // Load the duplicated frame from JSON (preserves individual objects)
     loadFrameFromJSON(frameData, updateFramesDisplay);

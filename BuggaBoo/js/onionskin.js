@@ -23,9 +23,15 @@ function toggleOnionSkin() {
 // Show the onion skin overlay
 function showOnionSkin() {
     if (!canvas || frames.length === 0) {
+        console.log('Cannot show onion skin - no canvas or no frames');
         hideOnionSkin(); // Clear any existing overlay
         return; // No frames to show
     }
+    
+    console.log('=== ONION SKIN DEBUG ===');
+    console.log('Current frame index:', currentFrame);
+    console.log('Total frames in array:', frames.length);
+    console.log('Frames array:', frames.map((f, i) => `Frame ${i}: ${f.thumbnail.substring(0, 50)}...`));
     
     // Determine the previous frame index
     // If currentFrame is beyond frames array (new unsaved frame), show last saved frame
@@ -34,11 +40,14 @@ function showOnionSkin() {
     if (currentFrame >= frames.length) {
         // New unsaved frame - show the last saved frame
         previousFrameIndex = frames.length - 1;
+        console.log('Current frame is unsaved, showing last saved frame:', previousFrameIndex);
     } else if (currentFrame > 0) {
         // Regular case - show previous frame
         previousFrameIndex = currentFrame - 1;
+        console.log('Showing previous frame:', previousFrameIndex);
     } else {
         // First frame - no previous frame to show
+        console.log('On first frame - no previous frame to show');
         hideOnionSkin(); // Clear any existing overlay
         return;
     }
@@ -46,7 +55,7 @@ function showOnionSkin() {
     if (previousFrameIndex >= 0 && frames[previousFrameIndex]) {
         const previousFrame = frames[previousFrameIndex];
         
-        console.log('Showing onion skin - previous frame index:', previousFrameIndex, 'thumbnail length:', previousFrame.thumbnail?.length);
+        console.log('Loading onion skin from frame index:', previousFrameIndex, 'thumbnail length:', previousFrame.thumbnail?.length);
         
         // Load the previous frame's thumbnail as a background overlay
         fabric.Image.fromURL(previousFrame.thumbnail, function(img) {
