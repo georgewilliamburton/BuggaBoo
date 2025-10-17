@@ -227,8 +227,9 @@ function loadFrame(index, isAutoPlayback = false) {
             stopPlaybackIfPlaying();
         }
         
-        // Save current frame first if it has changes (but not during playback)
-        if (!isAutoPlayback && currentFrame >= 0 && currentFrame < frames.length && canvas.getObjects().length > 0) {
+        // Save current frame first (but not during playback)
+        // Always save if we're on a valid frame, regardless of whether it has objects
+        if (!isAutoPlayback && currentFrame >= 0 && currentFrame < frames.length) {
             const frameData = {
                 json: canvas.toJSON(),
                 thumbnail: canvas.toDataURL('image/png')
