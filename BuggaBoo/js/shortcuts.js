@@ -29,6 +29,11 @@ function initializeKeyboardShortcuts() {
             e.preventDefault();
             redo();
         }
+        // Ctrl/Cmd + A for select all
+        if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+            e.preventDefault();
+            selectAllObjects();
+        }
         // Ctrl/Cmd + S for save frame
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();

@@ -79,3 +79,24 @@ function setBrushSize(size) {
 
     canvas.freeDrawingBrush.width = size;
 }
+
+// Select all objects on canvas
+function selectAllObjects() {
+    if (!canvas) return;
+    
+    const objects = canvas.getObjects();
+    if (objects.length === 0) return;
+    
+    // Switch to select mode if not already
+    if (currentTool !== 'select') {
+        setTool('select');
+    }
+    
+    // Create active selection with all objects
+    const selection = new fabric.ActiveSelection(objects, {
+        canvas: canvas
+    });
+    
+    canvas.setActiveObject(selection);
+    canvas.requestRenderAll();
+}
