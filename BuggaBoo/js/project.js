@@ -124,11 +124,18 @@ function applyLoadedProject(projectData) {
         const { width, height, label } = projectData.canvasSize;
         currentCanvasSize = label;
         
-        // Resize canvas
-        canvas.setWidth(width);
-        canvas.setHeight(height);
-        canvas.backgroundColor = projectData.settings?.backgroundColor || '#ffffff';
-        canvas.renderAll();
+        // Create or resize canvas
+        if (!canvas) {
+            // Canvas doesn't exist yet - create it
+            createNewCanvas(width, height);
+        } else {
+            // Canvas exists - resize it
+            canvas.setWidth(width);
+            canvas.setHeight(height);
+            canvas.backgroundColor = projectData.settings?.backgroundColor || '#ffffff';
+            canvas.clear();
+            canvas.renderAll();
+        }
         
         // Load frames
         frames = projectData.frames;
@@ -164,8 +171,17 @@ function applyLoadedProject(projectData) {
         // Reset to safe state
         frames = [];
         currentFrame = -1;
-        canvas.clear();
+        if (canvas) {
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff';
+            canvas.renderAll();
+        }
         updateFramesDisplay();
+        
+        // Show canvas size modal if no canvas exists
+        if (!canvas) {
+            showCanvasSizeModal();
+        }
     }
 }
 
