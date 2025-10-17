@@ -407,16 +407,5 @@ function renderGIF(gif) {
     // Start rendering
     console.log('Starting GIF render...');
     gif.render();
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // Show success message with OK button
-        showInfoModal('GIF Created!', `✅ Your animated GIF has been saved!\n📊 ${frames.length} frames at 5 FPS`, '🎉');
-    });
-
-    // Start rendering
-    gif.render();
 }
 
