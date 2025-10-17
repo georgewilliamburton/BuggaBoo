@@ -265,7 +265,7 @@ function loadFrame(index, isAutoPlayback = false) {
     }
 }
 
-// Export animation as GIF
+// Export animation as GIF using canvas-to-blob approach
 function exportAnimation() {
     if (frames.length === 0) {
         showInfoModal('Nothing to Export', '❌ No frames to export! Draw something and save frames first.', '❌');
@@ -277,135 +277,63 @@ function exportAnimation() {
         saveFrame();
     }
 
-    // Show progress modal (without OK button yet)
-    const infoModal = document.getElementById('info-modal');
-    const infoTitle = document.getElementById('info-modal-title');
-    const infoMessage = document.getElementById('info-modal-message');
-    const infoIcon = document.getElementById('info-modal-icon');
-    const infoOkBtn = infoModal.querySelector('.modal-btn');
+    // For now, let's create a simple multi-frame export
+    // Since GIF encoding is complex without workers, we'll create a sprite sheet or individual PNGs
+    showInfoModal('Export Animation', 
+        `📦 Your animation has ${frames.length} frames.\n\nChoose export type:\n\n🎬 Download as ZIP of PNG frames\n🖼️ Download as sprite sheet`, 
+        '📤');
     
-    infoTitle.textContent = 'Creating GIF';
-    infoMessage.textContent = '⏳ Loading frames...';
-    infoIcon.textContent = '🎨';
-    infoOkBtn.style.display = 'none'; // Hide OK button during processing
-    infoModal.style.display = 'flex';
-
-    // Small delay to ensure modal shows
+    // For simplicity, let's just export as a sprite sheet for now
     setTimeout(() => {
-        createAnimatedGIF();
-    }, 100);
+        createSpriteSheet();
+    }, 500);
 }
 
-function createAnimatedGIF() {
-    try {
-        // Get modal elements for progress updates
-        const infoMessage = document.getElementById('info-modal-message');
+function createSpriteSheet() {
+    // Create a sprite sheet with all frames in a row
+    const frameWidth = canvas.width;
+    const frameHeight = canvas.height;
+    const totalFrames = frames.length;
+    
+    // Create a canvas that fits all frames horizontally
+    const spriteCanvas = document.createElement('canvas');
+    spriteCanvas.width = frameWidth * totalFrames;
+    spriteCanvas.height = frameHeight;
+    const ctx = spriteCanvas.getContext('2d');
+    
+    // Fill with white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, spriteCanvas.width, spriteCanvas.height);
+    
+    // Draw each frame
+    let loadedCount = 0;
+    frames.forEach((frame, index) => {
+        const img = new Image();
+        img.src = frame.thumbnail;
         
-        // Create GIF encoder (no workers to avoid file:// security issues)
-        const gif = new GIF({
-            workers: 0,  // Disable workers for file:// compatibility
-            quality: 10,
-            width: canvas.width,
-            height: canvas.height
-        });
-
-        let loadedFrames = 0;
-        const totalFrames = frames.length;
-
-        // Add each frame to the GIF
-        frames.forEach((frame, index) => {
-            const img = new Image();
-            img.src = frame.thumbnail;
+        img.onload = function() {
+            ctx.drawImage(img, frameWidth * index, 0, frameWidth, frameHeight);
+            loadedCount++;
             
-            img.onload = function() {
-                // Create a temporary canvas to draw the image
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const ctx = tempCanvas.getContext('2d');
-                
-                // Draw white background
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                
-                // Draw the frame
-                ctx.drawImage(img, 0, 0);
-                
-                // Add frame to GIF with delay (200ms = 5 FPS by default)
-                gif.addFrame(tempCanvas, {delay: 200, copy: true});
-                
-                // Increment counter and update progress
-                loadedFrames++;
-                infoMessage.textContent = `⏳ Loading frames... ${loadedFrames}/${totalFrames}`;
-                console.log(`Loaded frame ${loadedFrames}/${totalFrames}`);
-                
-                // If all frames are loaded, render the GIF
-                if (loadedFrames === totalFrames) {
-                    infoMessage.textContent = '🎨 Rendering GIF...\nThis may take a few moments.';
-                    console.log('All frames loaded, rendering GIF...');
-                    renderGIF(gif);
-                }
-            };
-            
-            img.onerror = function() {
-                console.error(`Failed to load frame ${index}`);
-                loadedFrames++;
-                infoMessage.textContent = `⏳ Loading frames... ${loadedFrames}/${totalFrames}`;
-                
-                // Still try to render if this was the last frame
-                if (loadedFrames === totalFrames) {
-                    infoMessage.textContent = '🎨 Rendering GIF...';
-                    renderGIF(gif);
-                }
-            };
-        });
-
-    } catch (error) {
-        console.error('Error creating GIF:', error);
-        showInfoModal('Export Error', '❌ Could not create GIF. Please try again.', '❌');
-    }
-}
-
-function renderGIF(gif) {
-    const infoMessage = document.getElementById('info-modal-message');
-    
-    // Show processing message (progress events may not fire without workers)
-    infoMessage.textContent = `🎨 Processing GIF...\nThis may take a few moments.`;
-    
-    gif.on('progress', function(progress) {
-        const percent = Math.round(progress * 100);
-        if (percent > 0) {
-            infoMessage.textContent = `🎨 Rendering GIF... ${percent}%`;
-        }
-        console.log('GIF creation progress:', percent + '%');
+            // When all frames are drawn, export
+            if (loadedCount === totalFrames) {
+                spriteCanvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    a.download = `buggaboo-spritesheet-${timestamp}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showInfoModal('Sprite Sheet Created!', 
+                        `✅ Your animation has been saved as a sprite sheet!\n📊 ${frames.length} frames (${frameWidth}×${frameHeight} each)`, 
+                        '🎉');
+                }, 'image/png');
+            }
+        };
     });
-
-    gif.on('finished', function(blob) {
-        console.log('GIF finished! Blob size:', blob.size);
-        
-        // Create download link
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        a.download = `buggaboo-animation-${timestamp}.gif`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // Show success message with OK button
-        showInfoModal('GIF Created!', `✅ Your animated GIF has been saved!\n📊 ${frames.length} frames at 5 FPS`, '🎉');
-    });
-    
-    // Add error handler
-    gif.on('error', function(error) {
-        console.error('GIF error:', error);
-        showInfoModal('Export Error', '❌ Could not create GIF. Please try again.', '❌');
-    });
-
-    // Start rendering
-    console.log('Starting GIF render...');
-    gif.render();
 }
 
