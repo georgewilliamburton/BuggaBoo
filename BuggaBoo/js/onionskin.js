@@ -46,27 +46,32 @@ function showOnionSkin() {
     if (previousFrameIndex >= 0 && frames[previousFrameIndex]) {
         const previousFrame = frames[previousFrameIndex];
         
-        // First clear any existing overlay to prevent ghosting
-        canvas.setOverlayImage(null, function() {
-            // Load the previous frame's thumbnail as a background overlay
-            fabric.Image.fromURL(previousFrame.thumbnail, function(img) {
-                if (!img) {
-                    console.error('Failed to load onion skin image');
-                    return;
-                }
-                
-                // Set opacity for ghost effect
-                img.set({
-                    opacity: onionSkinOpacity,
-                    selectable: false,
-                    evented: false,
-                    excludeFromExport: true
-                });
-                
-                // Add as overlay (behind all objects but visible)
-                canvas.setOverlayImage(img, canvas.renderAll.bind(canvas), {
-                    opacity: onionSkinOpacity
-                });
+        console.log('Showing onion skin - previous frame index:', previousFrameIndex, 'thumbnail length:', previousFrame.thumbnail?.length);
+        
+        // Load the previous frame's thumbnail as a background overlay
+        fabric.Image.fromURL(previousFrame.thumbnail, function(img) {
+            if (!img) {
+                console.error('Failed to load onion skin image');
+                return;
+            }
+            
+            console.log('Onion skin image loaded successfully, size:', img.width, 'x', img.height);
+            
+            // Scale image to match canvas size
+            img.scaleToWidth(canvas.width);
+            img.scaleToHeight(canvas.height);
+            
+            // Set opacity for ghost effect
+            img.set({
+                opacity: onionSkinOpacity,
+                selectable: false,
+                evented: false,
+                excludeFromExport: true
+            });
+            
+            // Use backgroundImage to render BEHIND current objects
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                opacity: onionSkinOpacity
             });
         });
     } else {
@@ -77,7 +82,10 @@ function showOnionSkin() {
 // Hide the onion skin overlay
 function hideOnionSkin() {
     if (canvas) {
-        canvas.setOverlayImage(null, canvas.renderAll.bind(canvas));
+        console.log('Hiding onion skin');
+        canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+        canvas.backgroundColor = '#ffffff'; // Restore white background
+        canvas.renderAll();
     }
 }
 
