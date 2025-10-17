@@ -20,9 +20,46 @@ body {
     background: #2c3e50;
     padding: 10px 15px;
     display: flex;
-    gap: 5px;
+    gap: 15px;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    justify-content: space-between;
+}
+
+/* Logo Styling */
+.app-logo {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    user-select: none;
+}
+
+.logo-bugga {
+    color: #E06F8B;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+}
+
+.logo-boo {
+    color: #31A2F2;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+}
+
+.logo-studio {
+    font-size: 14px;
+    color: #A3CE27;
+    font-weight: 600;
+    margin-left: 4px;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+}
+
+/* Menu Buttons Container */
+.menu-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
 }
 
 .menu-btn {
