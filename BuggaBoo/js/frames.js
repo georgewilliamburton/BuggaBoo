@@ -51,6 +51,9 @@ function addNewFrame() {
     canvas.renderAll();
     
     currentFrame = frames.length;
+    
+    // Update the display to show the new blank frame
+    updateFramesDisplay();
 }
 
 // Helper function to load frame as editable image
