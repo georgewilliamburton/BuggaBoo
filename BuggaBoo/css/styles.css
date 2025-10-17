@@ -1,0 +1,450 @@
+/* Animation Maker - Main Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #31A2F2;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto auto 1fr 145px;
+    overflow: hidden;
+}
+
+/* Top Menu Bar */
+.top-menu {
+    background: #2c3e50;
+    padding: 10px 15px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.menu-btn {
+    padding: 8px 16px;
+    background: #34495e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.menu-btn:hover {
+    background: #3d566e;
+}
+
+.separator {
+    width: 1px;
+    height: 20px;
+    background: #445566;
+    margin: 0 5px;
+}
+
+/* Canvas Size Buttons */
+.canvas-size-bar {
+    background: #34495e;
+    padding: 8px 15px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 11px;
+    color: #95a5a6;
+    font-weight: 600;
+}
+
+.size-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+.size-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.size-btn:active {
+    transform: translateY(0);
+}
+
+/* Main Layout */
+.main-area {
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* Left Toolbar */
+.left-toolbar {
+    width: 70px;
+    background: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 5px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.tool-btn {
+    width: 60px;
+    height: 60px;
+    background: #34495e;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    background: #3d566e;
+    border-color: #4a6278;
+}
+
+.tool-btn.active {
+    background: #E06F8B;
+    border-color: #E06F8B;
+}
+
+/* Center Canvas Area */
+.canvas-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+#canvas-container {
+    background: white;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#canvas-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Right Color Palette */
+.right-palette {
+    width: 90px;
+    background: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 10px;
+    gap: 15px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    overflow-y: auto;
+}
+
+.brush-sizes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.brush-size-btn {
+    width: 50px;
+    height: 50px;
+    background: #34495e;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.brush-size-btn:hover {
+    background: #3d566e;
+}
+
+.brush-size-btn.active {
+    border-color: #E06F8B;
+    background: #3d566e;
+}
+
+.brush-size-btn .dot {
+    background: #E06F8B;
+    border-radius: 50%;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.color-btn {
+    width: 32px;
+    height: 32px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.active {
+    border-color: white;
+    box-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+.color-picker-btn {
+    background: linear-gradient(135deg, 
+        #ff0000 0%, 
+        #ff7f00 16.67%, 
+        #ffff00 33.33%, 
+        #00ff00 50%, 
+        #0000ff 66.67%, 
+        #8b00ff 83.33%, 
+        #ff00ff 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.color-picker-btn input[type="color"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Bottom Frames Strip */
+.frames-strip {
+    background: #2c3e50;
+    display: flex;
+    padding: 15px;
+    padding-bottom: 5px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    scroll-behavior: smooth;
+}
+
+/* Fun Brush Ninja-style scrollbar */
+.frames-strip::-webkit-scrollbar {
+    height: 12px;
+}
+
+.frames-strip::-webkit-scrollbar-track {
+    background: #1a252f;
+    border-radius: 10px;
+    margin: 0 10px;
+}
+
+.frames-strip::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #E06F8B, #F39C12);
+    border-radius: 10px;
+    border: 2px solid #1a252f;
+    transition: all 0.3s;
+}
+
+.frames-strip::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #F39C12, #E06F8B);
+    transform: scaleY(1.2);
+}
+
+.frames-container-inner {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+    min-width: min-content;
+}
+
+.frame {
+    flex-shrink: 0;
+    min-width: 90px;
+    width: 90px;
+    height: 90px;
+    background: #34495e;
+    border: 3px solid #445566;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.frame:hover {
+    border-color: #5a7a8f;
+    transform: translateY(-2px);
+}
+
+.frame.active {
+    border-color: #E06F8B;
+    box-shadow: 0 0 12px rgba(224, 111, 139, 0.5);
+}
+
+.frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.frame-number {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.add-frame-btn {
+    flex-shrink: 0;
+    min-width: 90px;
+    width: 90px;
+    height: 90px;
+    background: #34495e;
+    border: 3px dashed #445566;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: #7f8c8d;
+    position: sticky;
+    right: 0;
+    transition: all 0.2s;
+}
+
+.add-frame-btn:hover {
+    background: #3d566e;
+    border-color: #E06F8B;
+    color: #E06F8B;
+}
+
+/* Current Frame Preview */
+.current-frame-preview {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+
+.preview-frame {
+    width: 90px;
+    height: 90px;
+    background: #34495e;
+    border: 3px solid #E06F8B;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 12px rgba(224, 111, 139, 0.5);
+}
+
+.preview-frame img,
+.preview-frame canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.preview-frame .frame-number {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: rgba(224, 111, 139, 0.9);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.preview-btn {
+    width: 42px;
+    height: 28px;
+    background: #34495e;
+    border: 2px solid #445566;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+    color: white;
+}
+
+.preview-btn:hover {
+    background: #3d566e;
+    border-color: #5a7a8f;
+}
+
+.preview-btn.duplicate:hover {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.preview-btn.delete:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a252f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #445566;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #556677;
+}

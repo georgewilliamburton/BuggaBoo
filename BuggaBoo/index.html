@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuggaBoo Animation Maker</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/modal.css">
+</head>
+<body>
+    <!-- Top Menu -->
+    <div class="top-menu">
+        <button class="menu-btn" onclick="createNewCanvas(512, 512)">New</button>
+        <button class="menu-btn" onclick="clearCanvas()">Clear</button>
+        <div class="separator"></div>
+        <button class="menu-btn" onclick="undo()">Undo</button>
+        <button class="menu-btn" onclick="saveFrame()">Save Frame</button>
+        <div class="separator"></div>
+        <button class="menu-btn" onclick="exportAnimation()">Export</button>
+    </div>
+
+    <!-- Canvas Size Selector -->
+    <div class="canvas-size-bar">
+        CANVAS SIZE:
+        <button class="size-btn" style="background: #3498db;" onclick="createNewCanvas(512, 512)">Square</button>
+        <button class="size-btn" style="background: #e74c3c;" onclick="createNewCanvas(768, 432)">Cinema</button>
+        <button class="size-btn" style="background: #9b59b6;" onclick="createNewCanvas(432, 768)">Portrait</button>
+        <button class="size-btn" style="background: #f39c12;" onclick="createNewCanvas(768, 384)">Wide</button>
+        <button class="size-btn" style="background: #1abc9c;" onclick="createNewCanvas(640, 640)">Large</button>
+        <button class="size-btn" style="background: #e84393;" onclick="createNewCanvas(1280, 720)">YouTube</button>
+        <button class="size-btn" style="background: #34495e;" onclick="createFullscreenCanvas()">Fullscreen</button>
+    </div>
+
+    <!-- Main Work Area -->
+    <div class="main-area">
+        <!-- Left Toolbar -->
+        <div class="left-toolbar">
+            <button class="tool-btn active" id="draw-tool" onclick="setTool('draw')" title="Draw">✏️</button>
+            <button class="tool-btn" id="select-tool" onclick="setTool('select')" title="Select">👆</button>
+            <button class="tool-btn" id="eraser-tool" onclick="setTool('eraser')" title="Eraser">🧹</button>
+        </div>
+
+        <!-- Canvas Area -->
+        <div class="canvas-area">
+            <canvas id="canvas-container"></canvas>
+        </div>
+
+        <!-- Right Color Palette -->
+        <div class="right-palette">
+            <!-- Brush Sizes -->
+            <div class="brush-sizes">
+                <button class="brush-size-btn" onclick="setBrushSize(2)" title="Extra Small">
+                    <div class="dot" style="width: 4px; height: 4px;"></div>
+                </button>
+                <button class="brush-size-btn" onclick="setBrushSize(4)" title="Small">
+                    <div class="dot" style="width: 8px; height: 8px;"></div>
+                </button>
+                <button class="brush-size-btn active" onclick="setBrushSize(8)" title="Medium">
+                    <div class="dot" style="width: 16px; height: 16px;"></div>
+                </button>
+                <button class="brush-size-btn" onclick="setBrushSize(16)" title="Large">
+                    <div class="dot" style="width: 24px; height: 24px;"></div>
+                </button>
+                <button class="brush-size-btn" onclick="setBrushSize(32)" title="Huge">
+                    <div class="dot" style="width: 32px; height: 32px;"></div>
+                </button>
+            </div>
+
+            <!-- Color Palette -->
+            <div class="color-grid">
+                <button class="color-btn" style="background: #ffffff;" onclick="setColor('#ffffff')"></button>
+                <button class="color-btn" style="background: #999999;" onclick="setColor('#999999')"></button>
+                <button class="color-btn active" style="background: #000000;" onclick="setColor('#000000')"></button>
+                <button class="color-btn" style="background: #E06F8B;" onclick="setColor('#E06F8B')"></button>
+                <button class="color-btn" style="background: #BE2633;" onclick="setColor('#BE2633')"></button>
+                <button class="color-btn" style="background: #7a5226;" onclick="setColor('#7a5226')"></button>
+                <button class="color-btn" style="background: #EB8931;" onclick="setColor('#EB8931')"></button>
+                <button class="color-btn" style="background: #F7E26B;" onclick="setColor('#F7E26B')"></button>
+                <button class="color-btn" style="background: #A3CE27;" onclick="setColor('#A3CE27')"></button>
+                <button class="color-btn" style="background: #3d722c;" onclick="setColor('#3d722c')"></button>
+                <button class="color-btn" style="background: #195d8a;" onclick="setColor('#195d8a')"></button>
+                <button class="color-btn" style="background: #31A2F2;" onclick="setColor('#31A2F2')"></button>
+                <button class="color-btn" style="background: #B2DCEF;" onclick="setColor('#B2DCEF')"></button>
+                <button class="color-btn color-picker-btn" title="Custom Color">
+                    <input type="color" id="custom-color-picker" onchange="setCustomColor(this.value)">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Frames Strip -->
+    <div class="frames-strip">
+        <div class="frames-container-inner" id="frames-container">
+            <!-- Frames will be added here dynamically -->
+            <button class="add-frame-btn" onclick="addNewFrame()" title="Add Frame">+</button>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal-overlay" id="warning-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">⚠️</div>
+                <div class="modal-title">Unsaved Changes</div>
+            </div>
+            <div class="modal-message" id="modal-message">
+                You have unsaved work. Would you like to save your animation before continuing?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeWarningModal()">Cancel</button>
+                <button class="modal-btn modal-btn-discard" onclick="confirmAction(false)">Don't Save</button>
+                <button class="modal-btn modal-btn-save" onclick="confirmAction(true)">Save & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">🗑️</div>
+                <div class="modal-title">Delete Frame</div>
+            </div>
+            <div class="modal-message" id="delete-modal-message">
+                Delete this frame?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn modal-btn-discard" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/canvas.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/frames.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/shortcuts.js"></script>
+    <script src="js/init.js"></script>
+</body>
+</html>
