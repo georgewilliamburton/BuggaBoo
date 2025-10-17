@@ -277,23 +277,26 @@ function exportAnimation() {
         saveFrame();
     }
 
+    // Get the playback speed (default to 5 FPS if not set)
+    const speed = typeof playbackSpeed !== 'undefined' ? playbackSpeed : 5;
+
     // Show info modal
     showInfoModal('Creating Video', 
-        `🎬 Recording your animation at ${currentSpeed} FPS...\n\nThis will take ${Math.ceil(frames.length / currentSpeed)} seconds.`, 
+        `🎬 Recording your animation at ${speed} FPS...\n\nThis will take ${Math.ceil(frames.length / speed)} seconds.`, 
         '🎥');
     
     // Small delay to ensure modal shows, then start recording
     setTimeout(() => {
-        recordAnimation();
+        recordAnimation(speed);
     }, 1000);
 }
 
-function recordAnimation() {
+function recordAnimation(speed) {
     // Close the modal so it doesn't appear in the recording
     document.getElementById('info-modal').style.display = 'none';
     
     // Get the canvas stream
-    const stream = canvas.getElement().captureStream(currentSpeed);
+    const stream = canvas.getElement().captureStream(speed);
     const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'video/webm;codecs=vp9',
         videoBitsPerSecond: 2500000
@@ -322,7 +325,7 @@ function recordAnimation() {
         
         // Show success message
         showInfoModal('Video Created!', 
-            `✅ Your animation video has been saved!\n📊 ${frames.length} frames at ${currentSpeed} FPS`, 
+            `✅ Your animation video has been saved!\n📊 ${frames.length} frames at ${speed} FPS`, 
             '🎉');
     };
     
@@ -341,6 +344,6 @@ function recordAnimation() {
         // Load and display the frame
         loadFrameFromJSON(frames[recordFrameIndex], () => {});
         recordFrameIndex++;
-    }, 1000 / currentSpeed);
+    }, 1000 / speed);
 }
 
