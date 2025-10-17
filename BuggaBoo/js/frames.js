@@ -369,19 +369,44 @@ function createAnimatedGIF() {
 function renderGIF(gif) {
     const infoMessage = document.getElementById('info-modal-message');
     
+    // Show processing message (progress events may not fire without workers)
+    infoMessage.textContent = `🎨 Processing GIF...\nThis may take a few moments.`;
+    
     gif.on('progress', function(progress) {
         const percent = Math.round(progress * 100);
-        infoMessage.textContent = `🎨 Rendering GIF... ${percent}%`;
+        if (percent > 0) {
+            infoMessage.textContent = `🎨 Rendering GIF... ${percent}%`;
+        }
         console.log('GIF creation progress:', percent + '%');
     });
 
     gif.on('finished', function(blob) {
+        console.log('GIF finished! Blob size:', blob.size);
+        
         // Create download link
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
         a.download = `buggaboo-animation-${timestamp}.gif`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show success message with OK button
+        showInfoModal('GIF Created!', `✅ Your animated GIF has been saved!\n📊 ${frames.length} frames at 5 FPS`, '🎉');
+    });
+    
+    // Add error handler
+    gif.on('error', function(error) {
+        console.error('GIF error:', error);
+        showInfoModal('Export Error', '❌ Could not create GIF. Please try again.', '❌');
+    });
+
+    // Start rendering
+    console.log('Starting GIF render...');
+    gif.render();
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
