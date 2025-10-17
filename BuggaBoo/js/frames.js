@@ -297,6 +297,9 @@ function createAnimatedGIF() {
             workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
         });
 
+        let loadedFrames = 0;
+        const totalFrames = frames.length;
+
         // Add each frame to the GIF
         frames.forEach((frame, index) => {
             const img = new Image();
@@ -319,8 +322,23 @@ function createAnimatedGIF() {
                 // Add frame to GIF with delay (200ms = 5 FPS by default)
                 gif.addFrame(tempCanvas, {delay: 200, copy: true});
                 
-                // If this is the last frame, render the GIF
-                if (index === frames.length - 1) {
+                // Increment counter
+                loadedFrames++;
+                console.log(`Loaded frame ${loadedFrames}/${totalFrames}`);
+                
+                // If all frames are loaded, render the GIF
+                if (loadedFrames === totalFrames) {
+                    console.log('All frames loaded, rendering GIF...');
+                    renderGIF(gif);
+                }
+            };
+            
+            img.onerror = function() {
+                console.error(`Failed to load frame ${index}`);
+                loadedFrames++;
+                
+                // Still try to render if this was the last frame
+                if (loadedFrames === totalFrames) {
                     renderGIF(gif);
                 }
             };
