@@ -279,14 +279,14 @@ function exportAnimation() {
 
     // Show progress modal (without OK button yet)
     const infoModal = document.getElementById('info-modal');
-    const infoTitle = document.getElementById('info-title');
-    const infoMessage = document.getElementById('info-message');
-    const infoEmoji = document.getElementById('info-emoji');
-    const infoOkBtn = document.getElementById('info-ok-btn');
+    const infoTitle = document.getElementById('info-modal-title');
+    const infoMessage = document.getElementById('info-modal-message');
+    const infoIcon = document.getElementById('info-modal-icon');
+    const infoOkBtn = infoModal.querySelector('.modal-btn');
     
     infoTitle.textContent = 'Creating GIF';
     infoMessage.textContent = '⏳ Loading frames...';
-    infoEmoji.textContent = '🎨';
+    infoIcon.textContent = '🎨';
     infoOkBtn.style.display = 'none'; // Hide OK button during processing
     infoModal.style.display = 'flex';
 
@@ -299,7 +299,7 @@ function exportAnimation() {
 function createAnimatedGIF() {
     try {
         // Get modal elements for progress updates
-        const infoMessage = document.getElementById('info-message');
+        const infoMessage = document.getElementById('info-modal-message');
         
         // Create GIF encoder
         const gif = new GIF({
@@ -368,7 +368,7 @@ function createAnimatedGIF() {
 }
 
 function renderGIF(gif) {
-    const infoMessage = document.getElementById('info-message');
+    const infoMessage = document.getElementById('info-modal-message');
     
     gif.on('progress', function(progress) {
         const percent = Math.round(progress * 100);
