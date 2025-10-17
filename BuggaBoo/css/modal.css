@@ -166,6 +166,32 @@
     background: rgba(255,255,255,0.1);
 }
 
+.assets-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+.assets-control-btn {
+    padding: 8px 16px;
+    background: #34495e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.assets-control-btn:hover {
+    background: #3d566e;
+}
+
 .assets-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));

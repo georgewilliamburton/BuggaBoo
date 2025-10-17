@@ -232,6 +232,87 @@ function deleteAsset(assetId, event) {
     renderAssetsGrid();
 }
 
+// Export assets to JSON file
+function exportAssets() {
+    if (assets.length === 0) {
+        alert('No assets to export!');
+        return;
+    }
+    
+    // Create JSON data
+    const dataStr = JSON.stringify(assets, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    
+    // Create download link
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `buggaboo-assets-${Date.now()}.json`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    // Show confirmation
+    alert(`Exported ${assets.length} asset(s) successfully!`);
+}
+
+// Import assets from JSON file
+function importAssets(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedAssets = JSON.parse(e.target.result);
+            
+            // Validate structure
+            if (!Array.isArray(importedAssets)) {
+                throw new Error('Invalid file format');
+            }
+            
+            // Ask user if they want to merge or replace
+            let shouldReplace = false;
+            if (assets.length > 0) {
+                shouldReplace = confirm(
+                    `You have ${assets.length} existing asset(s). ` +
+                    `Do you want to REPLACE them?\n\n` +
+                    `Click OK to REPLACE (delete existing)\n` +
+                    `Click Cancel to MERGE (keep existing + add new)`
+                );
+            }
+            
+            if (shouldReplace) {
+                assets = importedAssets;
+            } else {
+                // Merge: update IDs to avoid conflicts
+                const maxId = assets.length > 0 ? Math.max(...assets.map(a => a.id)) : 0;
+                importedAssets.forEach((asset, index) => {
+                    asset.id = maxId + index + 1;
+                    assets.push(asset);
+                });
+            }
+            
+            // Save and refresh
+            saveAssetsToStorage();
+            renderAssetsGrid();
+            
+            alert(`Successfully imported ${importedAssets.length} asset(s)!`);
+        } catch (error) {
+            alert('Error importing assets: ' + error.message);
+            console.error('Import error:', error);
+        }
+    };
+    
+    reader.readAsText(file);
+    
+    // Reset input so same file can be imported again
+    event.target.value = '';
+}
+
 // Initialize assets on page load
 function initializeAssets() {
     loadAssetsFromStorage();

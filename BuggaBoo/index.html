@@ -206,6 +206,15 @@
                 <div class="modal-title">Asset Library</div>
                 <button class="modal-close-btn" onclick="closeAssetsLibrary()">✕</button>
             </div>
+            <div class="assets-controls">
+                <button class="assets-control-btn" onclick="exportAssets()" title="Export assets to file">
+                    💾 Export Assets
+                </button>
+                <button class="assets-control-btn" onclick="document.getElementById('import-assets-input').click()" title="Import assets from file">
+                    📂 Import Assets
+                </button>
+                <input type="file" id="import-assets-input" accept=".json" style="display: none;" onchange="importAssets(event)">
+            </div>
             <div class="assets-grid" id="assets-grid">
                 <div class="assets-empty">No assets saved yet. Select objects and use "Save Selection" to create assets!</div>
             </div>
