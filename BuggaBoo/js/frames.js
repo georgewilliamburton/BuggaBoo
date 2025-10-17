@@ -221,6 +221,11 @@ function deleteCurrentFrame() {
 // Load a specific frame
 function loadFrame(index) {
     if (index >= 0 && index < frames.length) {
+        // Stop playback if playing (user is manually selecting frames)
+        if (typeof stopPlaybackIfPlaying === 'function') {
+            stopPlaybackIfPlaying();
+        }
+        
         // Save current frame first if it has changes
         if (currentFrame >= 0 && currentFrame < frames.length && canvas.getObjects().length > 0) {
             const frameData = {

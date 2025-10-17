@@ -503,36 +503,134 @@ body {
 .frames-strip {
     background: #2c3e50;
     display: flex;
+    flex-direction: column;
     padding: 15px;
     padding-bottom: 5px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* Playback Controls */
+.playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+}
+
+.playback-btn {
+    background: #34495e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.playback-btn:hover {
+    background: #3d566e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.playback-btn.playing {
+    background: #e74c3c;
+}
+
+.playback-btn.playing:hover {
+    background: #c0392b;
+}
+
+.speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.speed-label {
+    color: #ecf0f1;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#speed-slider {
+    flex: 1;
+    max-width: 200px;
+    height: 6px;
+    border-radius: 3px;
+    background: #34495e;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+#speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #E06F8B;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#speed-slider::-webkit-slider-thumb:hover {
+    background: #F39C12;
+    transform: scale(1.2);
+}
+
+#speed-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #E06F8B;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+#speed-slider::-moz-range-thumb:hover {
+    background: #F39C12;
+    transform: scale(1.2);
+}
+
+.speed-value {
+    color: #E06F8B;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.frames-container-inner {
     overflow-x: auto;
     overflow-y: hidden;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
-    align-items: center;
-    justify-content: center;
-    position: relative;
     scroll-behavior: smooth;
 }
 
 /* Fun Brush Ninja-style scrollbar */
-.frames-strip::-webkit-scrollbar {
+.frames-container-inner::-webkit-scrollbar {
     height: 12px;
 }
 
-.frames-strip::-webkit-scrollbar-track {
+.frames-container-inner::-webkit-scrollbar-track {
     background: #1a252f;
     border-radius: 10px;
     margin: 0 10px;
 }
 
-.frames-strip::-webkit-scrollbar-thumb {
+.frames-container-inner::-webkit-scrollbar-thumb {
     background: linear-gradient(45deg, #E06F8B, #F39C12);
     border-radius: 10px;
     border: 2px solid #1a252f;
     transition: all 0.3s;
 }
 
-.frames-strip::-webkit-scrollbar-thumb:hover {
+.frames-container-inner::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(45deg, #F39C12, #E06F8B);
     transform: scaleY(1.2);
 }
