@@ -11,6 +11,9 @@ function initializeApp() {
     // Initialize keyboard shortcuts
     initializeKeyboardShortcuts();
     
+    // Initialize assets system
+    initializeAssets();
+    
     console.log('Animation Maker initialized!');
 }
 

@@ -27,6 +27,14 @@
             <button class="menu-btn" onclick="redo()">Redo</button>
             <button class="menu-btn" onclick="saveFrame()">Save Frame</button>
             <div class="separator"></div>
+            <div class="dropdown-container">
+                <button class="menu-btn dropdown-toggle" onclick="toggleAssetsDropdown()">Assets ▾</button>
+                <div class="dropdown-menu" id="assets-dropdown">
+                    <button class="dropdown-item" onclick="saveAsset()">💾 Save Selection</button>
+                    <button class="dropdown-item" onclick="showAssetsLibrary()">📦 View Library</button>
+                </div>
+            </div>
+            <div class="separator"></div>
             <button class="menu-btn" onclick="exportAnimation()">Export</button>
         </div>
     </div>
@@ -190,11 +198,26 @@
         </div>
     </div>
 
+    <!-- Assets Library Modal -->
+    <div class="modal-overlay" id="assets-modal">
+        <div class="modal modal-large">
+            <div class="modal-header">
+                <div class="modal-icon">📦</div>
+                <div class="modal-title">Asset Library</div>
+                <button class="modal-close-btn" onclick="closeAssetsLibrary()">✕</button>
+            </div>
+            <div class="assets-grid" id="assets-grid">
+                <div class="assets-empty">No assets saved yet. Select objects and use "Save Selection" to create assets!</div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Modules -->
     <script src="js/canvas.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/frames.js"></script>
     <script src="js/onionskin.js"></script>
+    <script src="js/assets.js"></script>
     <script src="js/layers.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shortcuts.js"></script>
