@@ -23,6 +23,9 @@ function updatePreview() {
 
 // Save current canvas as a frame (with JSON and thumbnail)
 function saveFrame() {
+    // Force canvas to render before capturing thumbnail
+    canvas.renderAll();
+    
     const frameData = {
         json: canvas.toJSON(),                    // Fabric.js objects (for editing)
         thumbnail: canvas.toDataURL('image/png')  // PNG image (for display)
@@ -174,6 +177,9 @@ function updateFramesDisplay() {
 
 // Duplicate current frame
 function duplicateCurrentFrame() {
+    // Force canvas to render before capturing current state
+    canvas.renderAll();
+    
     // Save current canvas state as the new duplicated frame (with JSON and thumbnail)
     const frameData = {
         json: canvas.toJSON(),
@@ -230,6 +236,9 @@ function loadFrame(index, isAutoPlayback = false) {
         // Save current frame first (but not during playback)
         // Always save if we're on a valid frame, regardless of whether it has objects
         if (!isAutoPlayback && currentFrame >= 0 && currentFrame < frames.length) {
+            // Force canvas to render before capturing thumbnail
+            canvas.renderAll();
+            
             const frameData = {
                 json: canvas.toJSON(),
                 thumbnail: canvas.toDataURL('image/png')
