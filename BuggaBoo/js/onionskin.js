@@ -20,12 +20,25 @@ function toggleOnionSkin() {
 
 // Show the onion skin overlay
 function showOnionSkin() {
-    if (!canvas || currentFrame <= 0 || frames.length === 0) {
-        return; // No previous frame to show
+    if (!canvas || frames.length === 0) {
+        return; // No frames to show
     }
     
-    // Get the previous frame
-    const previousFrameIndex = currentFrame - 1;
+    // Determine the previous frame index
+    // If currentFrame is beyond frames array (new unsaved frame), show last saved frame
+    // Otherwise show the frame before current
+    let previousFrameIndex;
+    if (currentFrame >= frames.length) {
+        // New unsaved frame - show the last saved frame
+        previousFrameIndex = frames.length - 1;
+    } else if (currentFrame > 0) {
+        // Regular case - show previous frame
+        previousFrameIndex = currentFrame - 1;
+    } else {
+        // First frame - no previous frame to show
+        return;
+    }
+    
     if (previousFrameIndex >= 0 && frames[previousFrameIndex]) {
         const previousFrame = frames[previousFrameIndex];
         

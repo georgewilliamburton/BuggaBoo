@@ -51,12 +51,14 @@ function addNewFrame() {
     // Clear canvas for new frame
     canvas.clear();
     canvas.backgroundColor = '#ffffff';
-    canvas.renderAll();
     
     currentFrame = frames.length;
     
-    // Update onion skin for the new frame
-    updateOnionSkin();
+    // Update onion skin for the new frame (after clear settles)
+    setTimeout(() => {
+        updateOnionSkin();
+        canvas.renderAll();
+    }, 0);
     
     // Update the display to show the new blank frame
     updateFramesDisplay();
