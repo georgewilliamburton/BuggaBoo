@@ -29,7 +29,9 @@
       "!*.md",
       "!scraped_pages/**/*",
       "!*.txt",
-      "!*.html",
+      "!downloaded-content.html",
+      "!github.html",
+      "!owlieboo.html",
       "!scraper.php",
       "!readexternal.php"
     ],
