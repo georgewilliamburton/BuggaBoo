@@ -55,6 +55,9 @@ function addNewFrame() {
     
     currentFrame = frames.length;
     
+    // Update onion skin for the new frame
+    updateOnionSkin();
+    
     // Update the display to show the new blank frame
     updateFramesDisplay();
 }
@@ -63,6 +66,7 @@ function addNewFrame() {
 function loadFrameFromJSON(frameData, callback) {
     canvas.loadFromJSON(frameData.json, function() {
         canvas.renderAll();
+        updateOnionSkin(); // Refresh onion skin for the new frame
         if (callback) callback();
     });
 }
