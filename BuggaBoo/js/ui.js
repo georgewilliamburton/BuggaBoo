@@ -44,7 +44,7 @@ function closeCanvasSizeModal() {
     document.getElementById('canvas-size-modal').classList.remove('show');
 }
 
-function selectCanvasSize(width, height) {
+function selectCanvasSize(width, height, label) {
     closeCanvasSizeModal();
     
     // Handle fullscreen sizing
@@ -70,9 +70,14 @@ function selectCanvasSize(width, height) {
         const availableWidth = windowWidth - leftToolbarWidth - rightPaletteWidth - 40;
         const availableHeight = windowHeight - topMenuHeight - framesStripHeight - 40;
         
+        // Set the label
+        currentCanvasSize = 'Fullscreen';
+        
         // Create canvas with these dimensions
         createNewCanvas(Math.floor(availableWidth), Math.floor(availableHeight));
     } else {
+        // Set the label (if provided, otherwise generate from dimensions)
+        currentCanvasSize = label || `${width}×${height}`;
         createNewCanvas(width, height);
     }
 }

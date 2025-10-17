@@ -6,11 +6,20 @@ let onionSkinOpacity = 0.3; // 30% opacity for ghost frames
 
 // Toggle onion skin on/off
 function toggleOnionSkin() {
+    const button = document.getElementById('onion-skin-toggle');
+    
+    // Check if we're on first frame or have no frames - don't allow enabling
+    if (!onionSkinEnabled && (currentFrame <= 0 || frames.length <= 1)) {
+        console.log('Cannot enable onion skin - need at least 2 frames (current:', currentFrame, 'total:', frames.length, ')');
+        // Keep it disabled, don't toggle
+        button.classList.remove('active');
+        return;
+    }
+    
     onionSkinEnabled = !onionSkinEnabled;
     
     console.log('Onion skin toggled:', onionSkinEnabled, 'Current frame:', currentFrame, 'Total frames:', frames.length);
     
-    const button = document.getElementById('onion-skin-toggle');
     if (onionSkinEnabled) {
         button.classList.add('active');
         showOnionSkin();

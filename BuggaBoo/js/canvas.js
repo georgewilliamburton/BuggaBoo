@@ -3,6 +3,7 @@
 
 let canvas;
 let hasUnsavedChanges = false;
+let currentCanvasSize = 'Custom'; // Track canvas size label for project save/load
 
 // Track changes
 function markAsChanged() {
