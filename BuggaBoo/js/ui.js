@@ -46,7 +46,35 @@ function closeCanvasSizeModal() {
 
 function selectCanvasSize(width, height) {
     closeCanvasSizeModal();
-    createNewCanvas(width, height);
+    
+    // Handle fullscreen sizing
+    if (width === 'fullscreen') {
+        // Calculate based on window size and known element heights
+        // This is more reliable than measuring DOM elements that may not be fully laid out
+        
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        
+        // Fixed widths for toolbars (from CSS)
+        const leftToolbarWidth = 70;  // .left-toolbar width
+        const rightPaletteWidth = 90; // .right-palette width
+        
+        // Measure the actual heights of top and bottom elements
+        const topMenu = document.querySelector('.top-menu');
+        const framesStrip = document.querySelector('.frames-strip');
+        const topMenuHeight = topMenu.offsetHeight;
+        const framesStripHeight = framesStrip.offsetHeight;
+        
+        // Calculate available space
+        // Subtract: toolbars + canvas area padding (20px each side = 40px total)
+        const availableWidth = windowWidth - leftToolbarWidth - rightPaletteWidth - 40;
+        const availableHeight = windowHeight - topMenuHeight - framesStripHeight - 40;
+        
+        // Create canvas with these dimensions
+        createNewCanvas(Math.floor(availableWidth), Math.floor(availableHeight));
+    } else {
+        createNewCanvas(width, height);
+    }
 }
 
 function confirmAction(shouldSave) {
