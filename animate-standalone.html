@@ -16,8 +16,8 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background: #31A2F2;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-rows: auto auto 1fr 145px;
             overflow: hidden;
         }
 
@@ -89,8 +89,8 @@
         /* Main Layout */
         .main-area {
             display: flex;
-            flex: 1;
             overflow: hidden;
+            min-height: 0;
         }
 
         /* Left Toolbar */
@@ -136,13 +136,23 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: auto;
+            overflow: hidden;
+            min-height: 0;
         }
 
         #canvas-container {
             background: white;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             display: block;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #canvas-container canvas {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto !important;
+            height: auto !important;
         }
 
         /* Right Color Palette */
@@ -216,18 +226,77 @@
             box-shadow: 0 0 8px rgba(255,255,255,0.5);
         }
 
+        .color-picker-btn {
+            background: linear-gradient(135deg, 
+                #ff0000 0%, 
+                #ff7f00 16.67%, 
+                #ffff00 33.33%, 
+                #00ff00 50%, 
+                #0000ff 66.67%, 
+                #8b00ff 83.33%, 
+                #ff00ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-picker-btn input[type="color"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
         /* Bottom Frames Strip */
         .frames-strip {
             background: #2c3e50;
-            height: 120px;
+            display: flex;
+            padding: 15px;
+            padding-bottom: 5px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* Fun Brush Ninja-style scrollbar */
+        .frames-strip::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .frames-strip::-webkit-scrollbar-track {
+            background: #1a252f;
+            border-radius: 10px;
+            margin: 0 10px;
+        }
+
+        .frames-strip::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #E06F8B, #F39C12);
+            border-radius: 10px;
+            border: 2px solid #1a252f;
+            transition: all 0.3s;
+        }
+
+        .frames-strip::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #F39C12, #E06F8B);
+            transform: scaleY(1.2);
+        }
+
+        .frames-container-inner {
             display: flex;
             gap: 10px;
-            padding: 15px;
-            overflow-x: auto;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+            align-items: center;
+            flex-wrap: nowrap;
+            min-width: min-content;
         }
 
         .frame {
+            flex-shrink: 0;
             min-width: 90px;
             width: 90px;
             height: 90px;
@@ -269,6 +338,7 @@
         }
 
         .add-frame-btn {
+            flex-shrink: 0;
             min-width: 90px;
             width: 90px;
             height: 90px;
@@ -281,6 +351,8 @@
             justify-content: center;
             font-size: 36px;
             color: #7f8c8d;
+            position: sticky;
+            right: 0;
             transition: all 0.2s;
         }
 
@@ -308,6 +380,111 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #556677;
         }
+
+        /* Warning Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #2c3e50;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon {
+            font-size: 48px;
+        }
+
+        .modal-title {
+            color: #ecf0f1;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .modal-message {
+            color: #bdc3c7;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-cancel {
+            background: #7f8c8d;
+            color: white;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #95a5a6;
+        }
+
+        .modal-btn-discard {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .modal-btn-discard:hover {
+            background: #c0392b;
+        }
+
+        .modal-btn-save {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .modal-btn-save:hover {
+            background: #27ae60;
+        }
     </style>
 </head>
 <body>
@@ -330,6 +507,7 @@
         <button class="size-btn" style="background: #9b59b6;" onclick="createNewCanvas(432, 768)">Portrait</button>
         <button class="size-btn" style="background: #f39c12;" onclick="createNewCanvas(768, 384)">Wide</button>
         <button class="size-btn" style="background: #1abc9c;" onclick="createNewCanvas(640, 640)">Large</button>
+        <button class="size-btn" style="background: #e84393;" onclick="createNewCanvas(1280, 720)">YouTube</button>
         <button class="size-btn" style="background: #34495e;" onclick="createFullscreenCanvas()">Fullscreen</button>
     </div>
 
@@ -351,6 +529,9 @@
         <div class="right-palette">
             <!-- Brush Sizes -->
             <div class="brush-sizes">
+                <button class="brush-size-btn" onclick="setBrushSize(2)" title="Extra Small">
+                    <div class="dot" style="width: 4px; height: 4px;"></div>
+                </button>
                 <button class="brush-size-btn" onclick="setBrushSize(4)" title="Small">
                     <div class="dot" style="width: 8px; height: 8px;"></div>
                 </button>
@@ -369,8 +550,8 @@
             <div class="color-grid">
                 <button class="color-btn" style="background: #ffffff;" onclick="setColor('#ffffff')"></button>
                 <button class="color-btn" style="background: #999999;" onclick="setColor('#999999')"></button>
-                <button class="color-btn" style="background: #000000;" onclick="setColor('#000000')"></button>
-                <button class="color-btn active" style="background: #E06F8B;" onclick="setColor('#E06F8B')"></button>
+                <button class="color-btn active" style="background: #000000;" onclick="setColor('#000000')"></button>
+                <button class="color-btn" style="background: #E06F8B;" onclick="setColor('#E06F8B')"></button>
                 <button class="color-btn" style="background: #BE2633;" onclick="setColor('#BE2633')"></button>
                 <button class="color-btn" style="background: #7a5226;" onclick="setColor('#7a5226')"></button>
                 <button class="color-btn" style="background: #EB8931;" onclick="setColor('#EB8931')"></button>
@@ -380,52 +561,187 @@
                 <button class="color-btn" style="background: #195d8a;" onclick="setColor('#195d8a')"></button>
                 <button class="color-btn" style="background: #31A2F2;" onclick="setColor('#31A2F2')"></button>
                 <button class="color-btn" style="background: #B2DCEF;" onclick="setColor('#B2DCEF')"></button>
+                <button class="color-btn color-picker-btn" title="Custom Color">
+                    <input type="color" id="custom-color-picker" onchange="setCustomColor(this.value)">
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Bottom Frames Strip -->
-    <div class="frames-strip" id="frames-container">
-        <button class="add-frame-btn" onclick="addNewFrame()" title="Add Frame">+</button>
+    <div class="frames-strip">
+        <div class="frames-container-inner" id="frames-container">
+            <!-- Frames will be added here dynamically -->
+            <button class="add-frame-btn" onclick="addNewFrame()" title="Add Frame">+</button>
+        </div>
+    </div>
+
+    <!-- Warning Modal -->
+    <div class="modal-overlay" id="warning-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">⚠️</div>
+                <div class="modal-title">Unsaved Changes</div>
+            </div>
+            <div class="modal-message" id="modal-message">
+                You have unsaved work. Would you like to save your animation before continuing?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeWarningModal()">Cancel</button>
+                <button class="modal-btn modal-btn-discard" onclick="confirmAction(false)">Don't Save</button>
+                <button class="modal-btn modal-btn-save" onclick="confirmAction(true)">Save & Continue</button>
+            </div>
+        </div>
     </div>
 
     <script>
         let canvas;
         let frames = [];
         let currentFrame = -1;
-        let currentColor = '#E06F8B';
+        let currentColor = '#000000';
         let currentBrushSize = 8;
         let currentTool = 'draw';
+        let hasUnsavedChanges = false;
+        let pendingAction = null;
+
+        // Track changes
+        function markAsChanged() {
+            hasUnsavedChanges = true;
+        }
+
+        // Warning modal functions
+        function showWarningModal(message, action) {
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('warning-modal').classList.add('show');
+            pendingAction = action;
+        }
+
+        function closeWarningModal() {
+            document.getElementById('warning-modal').classList.remove('show');
+            pendingAction = null;
+        }
+
+        function confirmAction(shouldSave) {
+            if (shouldSave) {
+                // Save current work
+                if (canvas.getObjects().length > 0 || canvas.backgroundImage) {
+                    saveFrame();
+                }
+                exportAnimation();
+            }
+            
+            // Execute the pending action
+            if (pendingAction) {
+                pendingAction();
+            }
+            
+            hasUnsavedChanges = false;
+            closeWarningModal();
+        }
+
+        // Check for unsaved changes before action
+        function checkUnsavedChanges(action, message = 'You have unsaved work. Would you like to save your animation before continuing?') {
+            if (hasUnsavedChanges || canvas.getObjects().length > 0 || frames.length > 0) {
+                showWarningModal(message, action);
+                return false;
+            }
+            action();
+            return true;
+        }
 
         // Initialize canvas
         function createNewCanvas(width = 512, height = 512) {
-            if (canvas && frames.length > 0) {
-                if (!confirm('Create a new canvas? This will clear all frames.')) {
-                    return;
+            const doCreate = () => {
+                if (canvas) {
+                    canvas.dispose();
                 }
+
+                frames = [];
+                currentFrame = -1;
+                hasUnsavedChanges = false;
+
+                canvas = new fabric.Canvas('canvas-container', {
+                    width: width,
+                    height: height,
+                    backgroundColor: '#ffffff',
+                    isDrawingMode: true
+                });
+
+                // Set initial brush
+                canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+                canvas.freeDrawingBrush.color = currentColor;
+                canvas.freeDrawingBrush.width = currentBrushSize;
+
+                // Enable rotation and scaling for all objects
+                fabric.Object.prototype.set({
+                    borderColor: '#E06F8B',
+                    cornerColor: '#E06F8B',
+                    cornerSize: 12,
+                    transparentCorners: false,
+                    cornerStyle: 'circle',
+                    rotatingPointOffset: 40
+                });
+
+                // Custom rotation cursor icon
+                function renderRotationIcon(ctx, left, top, styleOverride, fabricObject) {
+                    const size = this.cornerSize;
+                    ctx.save();
+                    ctx.translate(left, top);
+                    ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+                    
+                    // Draw circular background
+                    ctx.fillStyle = '#E06F8B';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    // Draw rotation arrows
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    
+                    // Draw curved arrow (rotation symbol)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size / 3, -Math.PI / 4, Math.PI * 1.25, false);
+                    ctx.stroke();
+                    
+                    // Arrow head
+                    ctx.beginPath();
+                    ctx.moveTo(size / 4, -size / 6);
+                    ctx.lineTo(size / 3.5, size / 8);
+                    ctx.lineTo(size / 6, 0);
+                    ctx.fill();
+                    
+                    ctx.restore();
+                }
+
+                // Apply custom rotation control
+                fabric.Object.prototype.controls.mtr = new fabric.Control({
+                    x: 0,
+                    y: -0.5,
+                    offsetY: -40,
+                    cursorStyle: 'crosshair',
+                    actionHandler: fabric.controlsUtils.rotationWithSnapping,
+                    actionName: 'rotate',
+                    render: renderRotationIcon,
+                    cornerSize: 24,
+                    withConnection: true
+                });
+
+                // Track changes
+                canvas.on('object:added', markAsChanged);
+                canvas.on('object:modified', markAsChanged);
+                canvas.on('object:removed', markAsChanged);
+
+                updateFramesDisplay();
+                console.log(`Canvas created: ${width}×${height}`);
+            };
+
+            if (canvas && (hasUnsavedChanges || frames.length > 0 || canvas.getObjects().length > 0)) {
+                checkUnsavedChanges(doCreate, 'Creating a new canvas will clear all your work. Save before continuing?');
+            } else {
+                doCreate();
             }
-
-            if (canvas) {
-                canvas.dispose();
-            }
-
-            frames = [];
-            currentFrame = -1;
-
-            canvas = new fabric.Canvas('canvas-container', {
-                width: width,
-                height: height,
-                backgroundColor: '#ffffff',
-                isDrawingMode: true
-            });
-
-            // Set initial brush
-            canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-            canvas.freeDrawingBrush.color = currentColor;
-            canvas.freeDrawingBrush.width = currentBrushSize;
-
-            updateFramesDisplay();
-            console.log(`Canvas created: ${width}×${height}`);
         }
 
         // Create fullscreen canvas
@@ -473,9 +789,35 @@
             document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
+            // Update brush size indicators to show new color
+            updateBrushSizeColors();
+
             if (currentTool === 'draw') {
                 canvas.freeDrawingBrush.color = color;
             }
+        }
+
+        // Set custom color from color picker
+        function setCustomColor(color) {
+            currentColor = color;
+            
+            // Update button states - mark the rainbow button as active
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.color-picker-btn').classList.add('active');
+
+            // Update brush size indicators to show new color
+            updateBrushSizeColors();
+
+            if (currentTool === 'draw') {
+                canvas.freeDrawingBrush.color = color;
+            }
+        }
+
+        // Update brush size button colors
+        function updateBrushSizeColors() {
+            document.querySelectorAll('.brush-size-btn .dot').forEach(dot => {
+                dot.style.background = currentColor;
+            });
         }
 
         // Set brush size
@@ -544,6 +886,7 @@
             const container = document.getElementById('frames-container');
             
             // Keep the add button, clear other frames
+            const addBtn = container.querySelector('.add-frame-btn');
             container.innerHTML = '';
 
             frames.forEach((frame, index) => {
@@ -563,13 +906,14 @@
                 container.appendChild(frameDiv);
             });
 
-            // Re-add the "Add Frame" button
-            const addBtn = document.createElement('button');
-            addBtn.className = 'add-frame-btn';
-            addBtn.innerHTML = '+';
-            addBtn.title = 'Add Frame';
-            addBtn.onclick = addNewFrame;
-            container.appendChild(addBtn);
+            // Re-add the add button at the end
+            if (addBtn) {
+                container.appendChild(addBtn);
+            }
+
+            // Auto-scroll to show the newest frame and add button
+            const framesStrip = container.parentElement;
+            framesStrip.scrollLeft = framesStrip.scrollWidth;
         }
 
         // Load a specific frame
@@ -624,6 +968,18 @@
 
         // Initialize with default canvas
         createNewCanvas(512, 512);
+        
+        // Set initial brush size colors to black
+        updateBrushSizeColors();
+
+        // Warn before leaving page
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges || canvas.getObjects().length > 0 || frames.length > 0) {
+                e.preventDefault();
+                e.returnValue = ''; // Chrome requires returnValue to be set
+                return ''; // Some browsers show this message
+            }
+        });
 
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
@@ -636,6 +992,11 @@
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 saveFrame();
+            }
+            // Spacebar for add new frame
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                addNewFrame();
             }
         });
     </script>

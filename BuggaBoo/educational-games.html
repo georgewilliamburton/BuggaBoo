@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuggaBoo Games - Navigation</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 3em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      font-size: 1.2em;
+      margin-bottom: 40px;
+    }
+    .stage {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .stage h2 {
+      color: #667eea;
+      font-size: 2em;
+      margin-bottom: 10px;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .stage-desc {
+      color: #666;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .game-link {
+      display: block;
+      text-align: center;
+      padding: 20px 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .game-link:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    .game-name {
+      font-size: 1.1em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 2em; }
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🦉 BuggaBoo Games</h1>
+    <p class="subtitle">Educational Games for Kids - Click to Play!</p>
+
+    <div class="stage">
+      <h2>🎮 Stage 1 - Pressing Keys</h2>
+      <p class="stage-desc">Perfect for beginners - learn to press keys and see what happens!</p>
+      <div class="games-grid">
+        <a href="depth_1/juegos-educativos_animals.html" class="game-link"><span class="game-name">Animals</span></a>
+        <a href="depth_1/juegos-educativos_marine.html" class="game-link"><span class="game-name">Marine</span></a>
+        <a href="depth_1/educational-games_jungle.html" class="game-link"><span class="game-name">Jungle</span></a>
+        <a href="depth_1/educational-games_dogs.html" class="game-link"><span class="game-name">Dogs</span></a>
+        <a href="depth_1/juegos-educativos_leaps.html" class="game-link"><span class="game-name">Leaps</span></a>
+        <a href="depth_1/juegos-educativos_egg.html" class="game-link"><span class="game-name">Egg</span></a>
+        <a href="depth_1/juegos-educativos_flying.html" class="game-link"><span class="game-name">Flying</span></a>
+        <a href="depth_1/juegos-educativos_shell.html" class="game-link"><span class="game-name">Shell</span></a>
+        <a href="depth_1/juegos-educativos_monkeys.html" class="game-link"><span class="game-name">Monkeys</span></a>
+        <a href="depth_1/juegos-educativos_hidden.html" class="game-link"><span class="game-name">Hidden</span></a>
+        <a href="depth_1/juegos-educativos_dolphin.html" class="game-link"><span class="game-name">Dolphin</span></a>
+        <a href="depth_1/juegos-educativos_frog.html" class="game-link"><span class="game-name">Frog</span></a>
+      </div>
+    </div>
+
+    <div class="stage">
+      <h2>🎯 Stage 2 - Moving the Mouse</h2>
+      <p class="stage-desc">Learn to move and control the mouse cursor!</p>
+      <div class="games-grid">
+        <a href="depth_1/educational-games_tree.html" class="game-link"><span class="game-name">Tree</span></a>
+        <a href="depth_1/educational-games_deep.html" class="game-link"><span class="game-name">Deep</span></a>
+        <a href="depth_1/educational-games_bugs.html" class="game-link"><span class="game-name">Bugs</span></a>
+        <a href="depth_1/educational-games_farm.html" class="game-link"><span class="game-name">Farm</span></a>
+        <a href="depth_1/educational-games_nocturnal.html" class="game-link"><span class="game-name">Nocturnal</span></a>
+        <a href="depth_1/educational-games_bananas.html" class="game-link"><span class="game-name">Bananas</span></a>
+        <a href="depth_1/educational-games_birds.html" class="game-link"><span class="game-name">Birds</span></a>
+        <a href="depth_1/educational-games_bubbles.html" class="game-link"><span class="game-name">Bubbles</span></a>
+        <a href="depth_1/educational-games_flowers.html" class="game-link"><span class="game-name">Flowers</span></a>
+        <a href="depth_1/educational-games_hummingbird.html" class="game-link"><span class="game-name">Hummingbird</span></a>
+        <a href="depth_1/educational-games_kids.html" class="game-link"><span class="game-name">Kids</span></a>
+        <a href="depth_1/educational-games_forms.html" class="game-link"><span class="game-name">Forms</span></a>
+      </div>
+    </div>
+
+    <div class="stage">
+      <h2>🌟 Stage 3 - Clicking & Dragging</h2>
+      <p class="stage-desc">Advanced skills - clicking, dragging, and more complex interactions!</p>
+      <div class="games-grid">
+        <a href="depth_1/educational-games_music.html" class="game-link"><span class="game-name">Music</span></a>
+        <a href="depth_1/educational-games_tooneame.html" class="game-link"><span class="game-name">Toon Me</span></a>
+        <a href="depth_1/educational-games_houses.html" class="game-link"><span class="game-name">Houses</span></a>
+        <a href="depth_1/educational-games_puzzles.html" class="game-link"><span class="game-name">Puzzles</span></a>
+        <a href="depth_1/educational-games_released.html" class="game-link"><span class="game-name">Released</span></a>
+        <a href="depth_1/educational-games_colors.html" class="game-link"><span class="game-name">Colors</span></a>
+        <a href="depth_1/educational-games_numbers.html" class="game-link"><span class="game-name">Numbers</span></a>
+        <a href="depth_1/educational-games_points.html" class="game-link"><span class="game-name">Points</span></a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
