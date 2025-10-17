@@ -265,7 +265,7 @@ function loadFrame(index, isAutoPlayback = false) {
     }
 }
 
-// Export animation as GIF using canvas-to-blob approach
+// Export animation as video using MediaRecorder
 function exportAnimation() {
     if (frames.length === 0) {
         showInfoModal('Nothing to Export', '❌ No frames to export! Draw something and save frames first.', '❌');
@@ -277,63 +277,70 @@ function exportAnimation() {
         saveFrame();
     }
 
-    // For now, let's create a simple multi-frame export
-    // Since GIF encoding is complex without workers, we'll create a sprite sheet or individual PNGs
-    showInfoModal('Export Animation', 
-        `📦 Your animation has ${frames.length} frames.\n\nChoose export type:\n\n🎬 Download as ZIP of PNG frames\n🖼️ Download as sprite sheet`, 
-        '📤');
+    // Show info modal
+    showInfoModal('Creating Video', 
+        `🎬 Recording your animation at ${currentSpeed} FPS...\n\nThis will take ${Math.ceil(frames.length / currentSpeed)} seconds.`, 
+        '🎥');
     
-    // For simplicity, let's just export as a sprite sheet for now
+    // Small delay to ensure modal shows, then start recording
     setTimeout(() => {
-        createSpriteSheet();
-    }, 500);
+        recordAnimation();
+    }, 1000);
 }
 
-function createSpriteSheet() {
-    // Create a sprite sheet with all frames in a row
-    const frameWidth = canvas.width;
-    const frameHeight = canvas.height;
-    const totalFrames = frames.length;
+function recordAnimation() {
+    // Close the modal so it doesn't appear in the recording
+    document.getElementById('info-modal').style.display = 'none';
     
-    // Create a canvas that fits all frames horizontally
-    const spriteCanvas = document.createElement('canvas');
-    spriteCanvas.width = frameWidth * totalFrames;
-    spriteCanvas.height = frameHeight;
-    const ctx = spriteCanvas.getContext('2d');
-    
-    // Fill with white background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, spriteCanvas.width, spriteCanvas.height);
-    
-    // Draw each frame
-    let loadedCount = 0;
-    frames.forEach((frame, index) => {
-        const img = new Image();
-        img.src = frame.thumbnail;
-        
-        img.onload = function() {
-            ctx.drawImage(img, frameWidth * index, 0, frameWidth, frameHeight);
-            loadedCount++;
-            
-            // When all frames are drawn, export
-            if (loadedCount === totalFrames) {
-                spriteCanvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                    a.download = `buggaboo-spritesheet-${timestamp}.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    showInfoModal('Sprite Sheet Created!', 
-                        `✅ Your animation has been saved as a sprite sheet!\n📊 ${frames.length} frames (${frameWidth}×${frameHeight} each)`, 
-                        '🎉');
-                }, 'image/png');
-            }
-        };
+    // Get the canvas stream
+    const stream = canvas.getElement().captureStream(currentSpeed);
+    const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 2500000
     });
+    
+    const chunks = [];
+    
+    mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) {
+            chunks.push(e.data);
+        }
+    };
+    
+    mediaRecorder.onstop = function() {
+        // Create blob and download
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        a.download = `buggaboo-animation-${timestamp}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Show success message
+        showInfoModal('Video Created!', 
+            `✅ Your animation video has been saved!\n📊 ${frames.length} frames at ${currentSpeed} FPS`, 
+            '🎉');
+    };
+    
+    // Start recording
+    mediaRecorder.start();
+    
+    // Play through the animation once
+    let recordFrameIndex = 0;
+    const recordInterval = setInterval(() => {
+        if (recordFrameIndex >= frames.length) {
+            clearInterval(recordInterval);
+            mediaRecorder.stop();
+            return;
+        }
+        
+        // Load and display the frame
+        loadFrameFromJSON(frames[recordFrameIndex], () => {});
+        recordFrameIndex++;
+    }, 1000 / currentSpeed);
 }
 
