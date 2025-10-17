@@ -301,13 +301,12 @@ function createAnimatedGIF() {
         // Get modal elements for progress updates
         const infoMessage = document.getElementById('info-modal-message');
         
-        // Create GIF encoder
+        // Create GIF encoder (no workers to avoid file:// security issues)
         const gif = new GIF({
-            workers: 2,
+            workers: 0,  // Disable workers for file:// compatibility
             quality: 10,
             width: canvas.width,
-            height: canvas.height,
-            workerScript: 'lib/gif.worker.js'
+            height: canvas.height
         });
 
         let loadedFrames = 0;
