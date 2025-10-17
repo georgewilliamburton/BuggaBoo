@@ -90,18 +90,22 @@ function createNewCanvas(width = 512, height = 512) {
 
         // Track changes and update preview
         canvas.on('object:added', () => {
+            saveCanvasState();
             markAsChanged();
             updatePreview();
         });
         canvas.on('object:modified', () => {
+            saveCanvasState();
             markAsChanged();
             updatePreview();
         });
         canvas.on('object:removed', () => {
+            // Don't save state here - we save before deletion in deleteLayer()
             markAsChanged();
             updatePreview();
         });
         canvas.on('path:created', () => {
+            saveCanvasState();
             markAsChanged();
             updatePreview();
         });
@@ -121,6 +125,9 @@ function createNewCanvas(width = 512, height = 512) {
                 }
             }
         });
+        
+        // Initialize layers panel listeners
+        initializeLayersPanelListeners();
 
         updateFramesDisplay();
         console.log(`Canvas created: ${width}×${height}`);
@@ -154,17 +161,84 @@ function createFullscreenCanvas() {
 // Clear canvas
 function clearCanvas() {
     if (confirm('Clear the canvas?')) {
+        saveCanvasState(); // Save state before clearing
         canvas.clear();
         canvas.backgroundColor = '#ffffff';
         canvas.renderAll();
     }
 }
 
+// Undo/Redo state management
+let undoStack = [];
+let redoStack = [];
+let isUndoRedoing = false;
+
+// Save canvas state for undo
+function saveCanvasState() {
+    if (isUndoRedoing) return;
+    
+    const state = JSON.stringify(canvas.toJSON());
+    
+    // Don't save if it's the same as the last state
+    if (undoStack.length > 0 && undoStack[undoStack.length - 1] === state) {
+        return;
+    }
+    
+    undoStack.push(state);
+    
+    // Limit undo stack to 50 states
+    if (undoStack.length > 50) {
+        undoStack.shift();
+    }
+    
+    // Clear redo stack when new action is made
+    redoStack = [];
+}
+
 // Undo
 function undo() {
-    const objects = canvas.getObjects();
-    if (objects.length > 0) {
-        canvas.remove(objects[objects.length - 1]);
-        canvas.renderAll();
+    if (undoStack.length > 0) {
+        isUndoRedoing = true;
+        
+        // Save current state to redo stack
+        redoStack.push(JSON.stringify(canvas.toJSON()));
+        
+        // Get previous state
+        const state = undoStack.pop();
+        
+        // Restore state
+        canvas.loadFromJSON(state, () => {
+            canvas.renderAll();
+            isUndoRedoing = false;
+            markAsChanged();
+            updatePreview();
+            if (document.getElementById('layers-panel').classList.contains('open')) {
+                updateLayersList();
+            }
+        });
+    }
+}
+
+// Redo
+function redo() {
+    if (redoStack.length > 0) {
+        isUndoRedoing = true;
+        
+        // Save current state to undo stack
+        undoStack.push(JSON.stringify(canvas.toJSON()));
+        
+        // Get next state
+        const state = redoStack.pop();
+        
+        // Restore state
+        canvas.loadFromJSON(state, () => {
+            canvas.renderAll();
+            isUndoRedoing = false;
+            markAsChanged();
+            updatePreview();
+            if (document.getElementById('layers-panel').classList.contains('open')) {
+                updateLayersList();
+            }
+        });
     }
 }

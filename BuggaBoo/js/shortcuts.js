@@ -14,10 +14,20 @@ function initializeKeyboardShortcuts() {
 
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + Shift + Z for redo
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') {
+            e.preventDefault();
+            redo();
+        }
         // Ctrl/Cmd + Z for undo
-        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
             e.preventDefault();
             undo();
+        }
+        // Ctrl/Cmd + Y for redo (alternative)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+            e.preventDefault();
+            redo();
         }
         // Ctrl/Cmd + S for save frame
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -38,6 +48,11 @@ function initializeKeyboardShortcuts() {
         if (e.key === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
             setTool('fill');
+        }
+        // L key for layers panel
+        if (e.key === 'l' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            toggleLayersPanel();
         }
         // Shift + Spacebar for duplicate frame
         if (e.shiftKey && e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
