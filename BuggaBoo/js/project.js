@@ -43,7 +43,7 @@ function saveProject() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    showWarningModal('Project Saved', '✅ Your project has been saved successfully!');
+    showInfoModal('Project Saved', '✅ Your project has been saved successfully!');
 }
 
 function loadProject() {
@@ -63,7 +63,7 @@ function loadProject() {
                 
                 // Validate project structure
                 if (!projectData.version || !projectData.frames || !projectData.canvasSize) {
-                    showWarningModal('Invalid Project', '❌ This file is not a valid BuggaBoo project.');
+                    showInfoModal('Invalid Project', '❌ This file is not a valid BuggaBoo project.', '❌');
                     return;
                 }
                 
@@ -72,7 +72,7 @@ function loadProject() {
                 
             } catch (error) {
                 console.error('Error loading project:', error);
-                showWarningModal('Load Error', '❌ Could not load project file. File may be corrupted.');
+                showInfoModal('Load Error', '❌ Could not load project file. File may be corrupted.', '❌');
             }
         };
         reader.readAsText(file);
@@ -159,11 +159,11 @@ function applyLoadedProject(projectData) {
         clearUndoStack();
         saveState();
         
-        showWarningModal('Project Loaded', `✅ Project loaded successfully!<br>📊 ${frames.length} frames restored`);
+        showInfoModal('Project Loaded', `✅ Project loaded successfully!\n📊 ${frames.length} frames restored`);
         
     } catch (error) {
         console.error('Error applying project:', error);
-        showWarningModal('Load Error', '❌ Could not apply project. Starting fresh.');
+        showInfoModal('Load Error', '❌ Could not apply project. Starting fresh.', '❌');
         
         // Reset to safe state
         frames = [];

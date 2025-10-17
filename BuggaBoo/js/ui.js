@@ -16,6 +16,18 @@ function closeWarningModal() {
     pendingAction = null;
 }
 
+// Info/Success modal functions
+function showInfoModal(title, message, icon = '✅') {
+    document.getElementById('info-modal-icon').textContent = icon;
+    document.getElementById('info-modal-title').textContent = title;
+    document.getElementById('info-modal-message').textContent = message;
+    document.getElementById('info-modal').classList.add('show');
+}
+
+function closeInfoModal() {
+    document.getElementById('info-modal').classList.remove('show');
+}
+
 // Delete confirmation modal
 function showDeleteModal(frameNumber, onConfirm) {
     document.getElementById('delete-modal-message').textContent = `Delete frame ${frameNumber}?`;
