@@ -21,16 +21,19 @@ function updatePreview() {
     }
 }
 
-// Save current canvas as a frame
+// Save current canvas as a frame (with JSON and thumbnail)
 function saveFrame() {
-    const dataURL = canvas.toDataURL('image/png');
+    const frameData = {
+        json: canvas.toJSON(),                    // Fabric.js objects (for editing)
+        thumbnail: canvas.toDataURL('image/png')  // PNG image (for display)
+    };
     
     if (currentFrame >= 0 && currentFrame < frames.length) {
         // Update existing frame
-        frames[currentFrame] = dataURL;
+        frames[currentFrame] = frameData;
     } else {
         // Add new frame
-        frames.push(dataURL);
+        frames.push(frameData);
         currentFrame = frames.length - 1;
     }
     
@@ -56,23 +59,10 @@ function addNewFrame() {
     updateFramesDisplay();
 }
 
-// Helper function to load frame as editable image
-function loadFrameAsEditableImage(imageDataUrl, callback) {
-    fabric.Image.fromURL(imageDataUrl, function(img) {
-        canvas.clear();
-        canvas.backgroundColor = '#ffffff';
-        
-        // Center the image and make it selectable
-        img.set({
-            left: 0,
-            top: 0,
-            selectable: true,
-            evented: true
-        });
-        
-        canvas.add(img);
+// Helper function to load frame from JSON (preserves individual objects)
+function loadFrameFromJSON(frameData, callback) {
+    canvas.loadFromJSON(frameData.json, function() {
         canvas.renderAll();
-        
         if (callback) callback();
     });
 }
@@ -91,7 +81,7 @@ function updateFramesDisplay() {
         frameDiv.onclick = () => loadFrame(index);
 
         const img = document.createElement('img');
-        img.src = frame;
+        img.src = frame.thumbnail;  // Use thumbnail for display
 
         const frameNumber = document.createElement('div');
         frameNumber.className = 'frame-number';
@@ -178,17 +168,20 @@ function updateFramesDisplay() {
 
 // Duplicate current frame
 function duplicateCurrentFrame() {
-    // Save current canvas state as the new duplicated frame
-    const currentCanvasData = canvas.toDataURL('image/png');
+    // Save current canvas state as the new duplicated frame (with JSON and thumbnail)
+    const frameData = {
+        json: canvas.toJSON(),
+        thumbnail: canvas.toDataURL('image/png')
+    };
     
     // Add it as a new frame (don't overwrite the existing one)
-    frames.push(currentCanvasData);
+    frames.push(frameData);
     
     // Move to the new duplicated frame
     currentFrame = frames.length - 1;
     
-    // Load the duplicated frame as an editable image (so user can select/modify it)
-    loadFrameAsEditableImage(currentCanvasData, updateFramesDisplay);
+    // Load the duplicated frame from JSON (preserves individual objects)
+    loadFrameFromJSON(frameData, updateFramesDisplay);
 }
 
 // Delete current frame
@@ -209,9 +202,9 @@ function deleteCurrentFrame() {
                 currentFrame = frames.length - 1;
             }
             
-            // Load the new current frame as editable
+            // Load the new current frame from JSON
             if (currentFrame >= 0) {
-                loadFrameAsEditableImage(frames[currentFrame], updateFramesDisplay);
+                loadFrameFromJSON(frames[currentFrame], updateFramesDisplay);
             }
         }
         
@@ -223,14 +216,17 @@ function deleteCurrentFrame() {
 function loadFrame(index) {
     if (index >= 0 && index < frames.length) {
         // Save current frame first if it has changes
-        if (currentFrame >= 0 && canvas.getObjects().length > 0) {
-            const dataURL = canvas.toDataURL('image/png');
-            frames[currentFrame] = dataURL;
+        if (currentFrame >= 0 && currentFrame < frames.length && canvas.getObjects().length > 0) {
+            const frameData = {
+                json: canvas.toJSON(),
+                thumbnail: canvas.toDataURL('image/png')
+            };
+            frames[currentFrame] = frameData;
         }
 
-        // Load selected frame as editable image
+        // Load selected frame from JSON (preserves individual objects)
         currentFrame = index;
-        loadFrameAsEditableImage(frames[index], updateFramesDisplay);
+        loadFrameFromJSON(frames[index], updateFramesDisplay);
     }
 }
 
@@ -254,7 +250,7 @@ function exportAnimation() {
         setTimeout(() => {
             const link = document.createElement('a');
             link.download = `frame-${String(index + 1).padStart(3, '0')}.png`;
-            link.href = frame;
+            link.href = frame.thumbnail; // Use thumbnail from new frame format
             link.click();
         }, index * 100);
     });
