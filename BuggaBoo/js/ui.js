@@ -28,6 +28,32 @@ function closeInfoModal() {
     document.getElementById('info-modal').classList.remove('show');
 }
 
+// Confirmation modal (Yes/No)
+let confirmCallback = null;
+
+function showConfirmModal(title, message, onConfirm, confirmText = 'Confirm', cancelText = 'Cancel', icon = '❓') {
+    document.getElementById('confirm-modal-icon').textContent = icon;
+    document.getElementById('confirm-modal-title').textContent = title;
+    document.getElementById('confirm-modal-message').textContent = message;
+    
+    // Update button texts
+    const confirmBtn = document.querySelector('#confirm-modal .modal-btn-save');
+    const cancelBtn = document.querySelector('#confirm-modal .modal-btn-cancel');
+    confirmBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+    
+    confirmCallback = onConfirm;
+    document.getElementById('confirm-modal').classList.add('show');
+}
+
+function closeConfirmModal(confirmed) {
+    document.getElementById('confirm-modal').classList.remove('show');
+    if (confirmed && confirmCallback) {
+        confirmCallback();
+    }
+    confirmCallback = null;
+}
+
 // Delete confirmation modal
 function showDeleteModal(frameNumber, onConfirm) {
     document.getElementById('delete-modal-message').textContent = `Delete frame ${frameNumber}?`;

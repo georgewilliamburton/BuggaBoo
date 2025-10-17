@@ -92,35 +92,21 @@ function loadProject() {
 }
 
 function showLoadProjectConfirmation(projectData) {
-    const modal = document.getElementById('delete-modal');
-    const message = document.getElementById('delete-message');
-    const confirmBtn = document.getElementById('confirm-delete-btn');
-    const cancelBtn = document.getElementById('cancel-delete-btn');
-    
     // Calculate project info
     const frameCount = projectData.frames.length;
     const createdDate = new Date(projectData.created).toLocaleString();
     const size = `${projectData.canvasSize.width}×${projectData.canvasSize.height}`;
     
-    message.innerHTML = `
-        <strong>Load Project?</strong><br><br>
-        📊 Frames: ${frameCount}<br>
-        📐 Canvas: ${size}<br>
-        📅 Created: ${createdDate}<br><br>
-        ⚠️ This will replace your current project!
-    `;
+    const message = `📊 Frames: ${frameCount}\n📐 Canvas: ${size}\n📅 Created: ${createdDate}\n\n⚠️ This will replace your current project!`;
     
-    // Set up confirmation
-    confirmBtn.onclick = () => {
-        modal.style.display = 'none';
-        applyLoadedProject(projectData);
-    };
-    
-    cancelBtn.onclick = () => {
-        modal.style.display = 'none';
-    };
-    
-    modal.style.display = 'flex';
+    showConfirmModal(
+        'Load Project?',
+        message,
+        () => applyLoadedProject(projectData),
+        'Load Project',
+        'Cancel',
+        '📂'
+    );
 }
 
 function applyLoadedProject(projectData) {
@@ -246,37 +232,31 @@ function loadAutoSavedProject() {
 }
 
 function showRestoreAutoSaveConfirmation(projectData) {
-    const modal = document.getElementById('delete-modal');
-    const message = document.getElementById('delete-message');
-    const confirmBtn = document.getElementById('confirm-delete-btn');
-    const cancelBtn = document.getElementById('cancel-delete-btn');
-    
     const frameCount = projectData.frames.length;
     const savedDate = new Date(projectData.saved).toLocaleString();
     
-    message.innerHTML = `
-        <strong>Restore Previous Session?</strong><br><br>
-        📊 Frames: ${frameCount}<br>
-        💾 Last saved: ${savedDate}<br><br>
-        Would you like to continue where you left off?
-    `;
+    const message = `📊 Frames: ${frameCount}\n💾 Last saved: ${savedDate}\n\nWould you like to continue where you left off?`;
     
-    confirmBtn.textContent = 'Restore';
-    confirmBtn.onclick = () => {
-        modal.style.display = 'none';
-        applyLoadedProject(projectData);
-        confirmBtn.textContent = 'Delete';
+    // Create a custom confirmation that handles both actions
+    showConfirmModal(
+        'Restore Previous Session?',
+        message,
+        () => applyLoadedProject(projectData),
+        'Restore',
+        'Start Fresh',
+        '💾'
+    );
+    
+    // Override the cancel action to also remove auto-save
+    const originalClose = closeConfirmModal;
+    window.closeConfirmModal = function(confirmed) {
+        if (!confirmed) {
+            localStorage.removeItem('buggaboo_autosave');
+            showCanvasSizeModal(); // Show canvas selection if starting fresh
+        }
+        originalClose(confirmed);
+        window.closeConfirmModal = originalClose; // Restore original
     };
-    
-    cancelBtn.textContent = 'Start Fresh';
-    cancelBtn.onclick = () => {
-        modal.style.display = 'none';
-        localStorage.removeItem('buggaboo_autosave');
-        confirmBtn.textContent = 'Delete';
-        cancelBtn.textContent = 'Cancel';
-    };
-    
-    modal.style.display = 'flex';
 }
 
 // Auto-save every 30 seconds

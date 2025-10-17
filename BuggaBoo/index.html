@@ -166,6 +166,23 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal (Yes/No) -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon" id="confirm-modal-icon">❓</div>
+                <div class="modal-title" id="confirm-modal-title">Confirm</div>
+            </div>
+            <div class="modal-message" id="confirm-modal-message">
+                Are you sure?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal(false)">Cancel</button>
+                <button class="modal-btn modal-btn-save" onclick="closeConfirmModal(true)">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal-overlay" id="delete-modal">
         <div class="modal">
