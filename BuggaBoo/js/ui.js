@@ -35,6 +35,20 @@ function confirmDelete() {
     closeDeleteModal();
 }
 
+// Canvas size selection modal
+function showCanvasSizeModal() {
+    document.getElementById('canvas-size-modal').classList.add('show');
+}
+
+function closeCanvasSizeModal() {
+    document.getElementById('canvas-size-modal').classList.remove('show');
+}
+
+function selectCanvasSize(width, height) {
+    closeCanvasSizeModal();
+    createNewCanvas(width, height);
+}
+
 function confirmAction(shouldSave) {
     if (shouldSave) {
         // Save current work

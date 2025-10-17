@@ -2,8 +2,8 @@
 // Initializes the application when the page loads
 
 function initializeApp() {
-    // Initialize with default canvas
-    createNewCanvas(512, 512);
+    // Show canvas size selection modal on startup
+    showCanvasSizeModal();
     
     // Set initial brush size colors to black
     updateBrushSizeColors();

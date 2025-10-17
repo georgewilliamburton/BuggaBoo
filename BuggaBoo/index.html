@@ -15,7 +15,7 @@
 <body>
     <!-- Top Menu -->
     <div class="top-menu">
-        <button class="menu-btn" onclick="createNewCanvas(512, 512)">New</button>
+        <button class="menu-btn" onclick="showCanvasSizeModal()">New</button>
         <button class="menu-btn" onclick="clearCanvas()">Clear</button>
         <div class="separator"></div>
         <button class="menu-btn" onclick="undo()">Undo</button>
@@ -132,6 +132,45 @@
             <div class="modal-buttons">
                 <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
                 <button class="modal-btn modal-btn-discard" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas Size Selection Modal -->
+    <div class="modal-overlay" id="canvas-size-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">📐</div>
+                <div class="modal-title">Choose Canvas Size</div>
+            </div>
+            <div class="modal-message">
+                Select a canvas size to start your animation:
+            </div>
+            <div class="canvas-size-grid">
+                <button class="canvas-size-option" onclick="selectCanvasSize(512, 512)" style="background: #3498db;">
+                    <div class="size-name">Square</div>
+                    <div class="size-dimensions">512×512</div>
+                </button>
+                <button class="canvas-size-option" onclick="selectCanvasSize(768, 432)" style="background: #e74c3c;">
+                    <div class="size-name">Cinema</div>
+                    <div class="size-dimensions">768×432</div>
+                </button>
+                <button class="canvas-size-option" onclick="selectCanvasSize(432, 768)" style="background: #9b59b6;">
+                    <div class="size-name">Portrait</div>
+                    <div class="size-dimensions">432×768</div>
+                </button>
+                <button class="canvas-size-option" onclick="selectCanvasSize(768, 384)" style="background: #f39c12;">
+                    <div class="size-name">Wide</div>
+                    <div class="size-dimensions">768×384</div>
+                </button>
+                <button class="canvas-size-option" onclick="selectCanvasSize(640, 640)" style="background: #1abc9c;">
+                    <div class="size-name">Large</div>
+                    <div class="size-dimensions">640×640</div>
+                </button>
+                <button class="canvas-size-option" onclick="selectCanvasSize(1280, 720)" style="background: #e84393;">
+                    <div class="size-name">YouTube</div>
+                    <div class="size-dimensions">1280×720</div>
+                </button>
             </div>
         </div>
     </div>
