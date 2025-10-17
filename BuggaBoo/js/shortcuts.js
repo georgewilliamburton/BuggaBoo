@@ -24,8 +24,23 @@ function initializeKeyboardShortcuts() {
             e.preventDefault();
             saveFrame();
         }
-        // Spacebar for add new frame
-        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        // S key for select tool
+        if (e.key === 's' && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            setTool('select');
+        }
+        // D key for draw tool
+        if (e.key === 'd' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            setTool('draw');
+        }
+        // Shift + Spacebar for duplicate frame
+        if (e.shiftKey && e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            duplicateCurrentFrame();
+        }
+        // Spacebar for add new frame (only if not shift)
+        else if (e.code === 'Space' && !e.shiftKey && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
             addNewFrame();
         }
