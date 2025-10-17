@@ -219,15 +219,16 @@ function deleteCurrentFrame() {
 }
 
 // Load a specific frame
-function loadFrame(index) {
+function loadFrame(index, isAutoPlayback = false) {
     if (index >= 0 && index < frames.length) {
         // Stop playback if playing (user is manually selecting frames)
-        if (typeof stopPlaybackIfPlaying === 'function') {
+        // But don't stop if this is an automatic playback frame change
+        if (!isAutoPlayback && typeof stopPlaybackIfPlaying === 'function') {
             stopPlaybackIfPlaying();
         }
         
-        // Save current frame first if it has changes
-        if (currentFrame >= 0 && currentFrame < frames.length && canvas.getObjects().length > 0) {
+        // Save current frame first if it has changes (but not during playback)
+        if (!isAutoPlayback && currentFrame >= 0 && currentFrame < frames.length && canvas.getObjects().length > 0) {
             const frameData = {
                 json: canvas.toJSON(),
                 thumbnail: canvas.toDataURL('image/png')

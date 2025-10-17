@@ -42,8 +42,8 @@ function startPlayback() {
     
     // Play frames in sequence
     playbackInterval = setInterval(() => {
-        // Load the current playback frame
-        loadFrame(currentPlaybackFrame);
+        // Load the current playback frame (pass true to indicate it's auto-playback)
+        loadFrame(currentPlaybackFrame, true);
         
         // Move to next frame
         currentPlaybackFrame++;
