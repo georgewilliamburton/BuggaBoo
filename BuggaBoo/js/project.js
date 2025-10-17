@@ -159,8 +159,12 @@ function applyLoadedProject(projectData) {
         
         // Update UI
         updateFramesDisplay();
-        clearUndoStack();
-        saveState();
+        
+        // Reset undo/redo stacks (clear history for fresh start)
+        if (typeof undoStack !== 'undefined') {
+            undoStack = [];
+            redoStack = [];
+        }
         
         showInfoModal('Project Loaded', `✅ Project loaded successfully!\n📊 ${frames.length} frames restored`);
         
