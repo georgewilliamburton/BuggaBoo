@@ -16,11 +16,17 @@ function setTool(tool) {
     if (tool === 'draw') {
         canvas.isDrawingMode = true;
         canvas.freeDrawingBrush.color = currentColor;
+        canvas.defaultCursor = 'crosshair';
     } else if (tool === 'eraser') {
         canvas.isDrawingMode = true;
         canvas.freeDrawingBrush.color = '#ffffff';
+        canvas.defaultCursor = 'crosshair';
     } else if (tool === 'select') {
         canvas.isDrawingMode = false;
+        canvas.defaultCursor = 'default';
+    } else if (tool === 'fill') {
+        canvas.isDrawingMode = false;
+        canvas.defaultCursor = 'pointer';
     }
 }
 

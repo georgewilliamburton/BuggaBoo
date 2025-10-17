@@ -108,6 +108,19 @@ function createNewCanvas(width = 512, height = 512) {
         canvas.on('after:render', () => {
             updatePreview();
         });
+        
+        // Handle fill tool clicks
+        canvas.on('mouse:down', (options) => {
+            if (currentTool === 'fill') {
+                if (options.target) {
+                    // Fill the clicked object
+                    options.target.set('fill', currentColor);
+                    canvas.renderAll();
+                    markAsChanged();
+                    updatePreview();
+                }
+            }
+        });
 
         updateFramesDisplay();
         console.log(`Canvas created: ${width}×${height}`);

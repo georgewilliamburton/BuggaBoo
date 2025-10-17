@@ -34,6 +34,11 @@ function initializeKeyboardShortcuts() {
             e.preventDefault();
             setTool('draw');
         }
+        // F key for fill tool
+        if (e.key === 'f' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            setTool('fill');
+        }
         // Shift + Spacebar for duplicate frame
         if (e.shiftKey && e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();

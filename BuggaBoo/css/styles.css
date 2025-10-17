@@ -124,6 +124,12 @@ body {
     border-color: #E06F8B;
 }
 
+.tool-btn svg {
+    width: 28px;
+    height: 28px;
+    color: white;
+}
+
 /* Center Canvas Area */
 .canvas-area {
     flex: 1;
