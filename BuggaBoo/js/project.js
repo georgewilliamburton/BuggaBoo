@@ -46,6 +46,16 @@ function saveProject() {
     showInfoModal('Project Saved', '✅ Your project has been saved successfully!');
 }
 
+function loadProjectFromStartup() {
+    // Close the canvas size modal first
+    closeCanvasSizeModal();
+    
+    // Small delay to ensure modal closes smoothly before file picker opens
+    setTimeout(() => {
+        loadProject();
+    }, 100);
+}
+
 function loadProject() {
     // Create file input
     const input = document.createElement('input');
