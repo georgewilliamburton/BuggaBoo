@@ -787,9 +787,11 @@ body {
 
 /* Tablets (landscape and portrait) */
 @media screen and (max-width: 1024px) {
-    /* Adjust body grid for smaller screens */
+    /* Adjust body grid for smaller screens - FIXED heights */
     body {
-        grid-template-rows: auto 1fr minmax(80px, auto) minmax(60px, auto);
+        grid-template-rows: 50px 1fr 90px 55px;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile browsers */
     }
 
     /* Make top menu scrollable if needed */
@@ -797,6 +799,8 @@ body {
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        min-height: 50px;
+        max-height: 50px;
     }
 
     /* Reduce logo size */
@@ -831,19 +835,24 @@ body {
         width: 180px;
     }
 
-    /* Frames section - reduce height */
+    /* Frames section - FIXED height */
     .frames-section {
-        max-height: 100px;
-        min-height: 80px;
+        height: 90px;
+        max-height: 90px;
+        min-height: 90px;
+        overflow-y: hidden;
     }
 
     .preview-canvas {
-        width: 60px;
-        height: 60px;
+        width: 65px;
+        height: 65px;
     }
 
-    /* Playback controls - compact */
+    /* Playback controls - FIXED height */
     .playback-controls-bar {
+        height: 55px;
+        max-height: 55px;
+        min-height: 55px;
         padding: 8px;
         gap: 10px;
     }
@@ -855,16 +864,20 @@ body {
 
 /* Mobile devices (portrait) */
 @media screen and (max-width: 768px) {
-    /* Stack layout more compactly */
+    /* Stack layout more compactly - FIXED heights */
     body {
-        grid-template-rows: auto 1fr minmax(70px, auto) minmax(50px, auto);
+        grid-template-rows: 45px 1fr 75px 50px;
+        height: 100vh;
+        height: 100dvh;
     }
 
     /* Top menu - make more compact */
     .top-menu {
         padding: 8px 10px;
         gap: 8px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        min-height: 45px;
+        max-height: 45px;
     }
 
     .app-logo {
@@ -925,27 +938,32 @@ body {
         max-height: 100%;
     }
 
-    /* Frames section - very compact */
+    /* Frames section - FIXED height */
     .frames-section {
-        max-height: 80px;
-        min-height: 70px;
+        height: 75px;
+        max-height: 75px;
+        min-height: 75px;
         padding: 5px;
+        overflow-y: hidden;
     }
 
     .preview-canvas {
-        width: 50px;
-        height: 50px;
+        width: 55px;
+        height: 55px;
     }
 
     .frame-item {
-        min-width: 50px;
+        min-width: 55px;
     }
 
-    /* Playback controls - minimal */
+    /* Playback controls - FIXED height */
     .playback-controls-bar {
+        height: 50px;
+        max-height: 50px;
+        min-height: 50px;
         padding: 6px;
         gap: 8px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: center;
     }
 
