@@ -10,9 +10,16 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background: #31A2F2;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
     display: grid;
     grid-template-rows: auto 1fr auto auto;
     overflow: hidden;
+    /* Ensure no scrolling */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 /* Top Menu Bar */
