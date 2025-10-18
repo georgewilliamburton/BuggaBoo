@@ -780,3 +780,309 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #556677;
 }
+
+/* ============================================
+   RESPONSIVE DESIGN - Tablet & Mobile
+   ============================================ */
+
+/* Tablets (landscape and portrait) */
+@media screen and (max-width: 1024px) {
+    /* Adjust body grid for smaller screens */
+    body {
+        grid-template-rows: auto 1fr minmax(80px, auto) minmax(60px, auto);
+    }
+
+    /* Make top menu scrollable if needed */
+    .top-menu {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Reduce logo size */
+    .app-logo {
+        font-size: 18px;
+    }
+
+    /* Smaller buttons */
+    .menu-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Adjust toolbar for tablets */
+    .tool-bar {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .tool-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    /* Layers panel - make narrower */
+    .layers-panel {
+        width: 50px;
+    }
+
+    .layers-panel.expanded {
+        width: 180px;
+    }
+
+    /* Frames section - reduce height */
+    .frames-section {
+        max-height: 100px;
+        min-height: 80px;
+    }
+
+    .preview-canvas {
+        width: 60px;
+        height: 60px;
+    }
+
+    /* Playback controls - compact */
+    .playback-controls-bar {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    #speed-slider {
+        width: 80px;
+    }
+}
+
+/* Mobile devices (portrait) */
+@media screen and (max-width: 768px) {
+    /* Stack layout more compactly */
+    body {
+        grid-template-rows: auto 1fr minmax(70px, auto) minmax(50px, auto);
+    }
+
+    /* Top menu - make more compact */
+    .top-menu {
+        padding: 8px 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .app-logo {
+        font-size: 16px;
+    }
+
+    .menu-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+
+    /* Hide separator on mobile */
+    .separator {
+        display: none;
+    }
+
+    /* Toolbar - vertical on mobile */
+    .tool-bar {
+        flex-direction: column;
+        padding: 6px;
+        gap: 6px;
+        width: 50px;
+    }
+
+    .tool-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .color-palette {
+        width: 40px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+    }
+
+    .color-btn {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Layers panel - very narrow when collapsed */
+    .layers-panel {
+        width: 45px;
+    }
+
+    .layers-panel.expanded {
+        width: 160px;
+    }
+
+    /* Canvas area - ensure it fits */
+    .main-area {
+        padding: 5px;
+    }
+
+    #canvas {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    /* Frames section - very compact */
+    .frames-section {
+        max-height: 80px;
+        min-height: 70px;
+        padding: 5px;
+    }
+
+    .preview-canvas {
+        width: 50px;
+        height: 50px;
+    }
+
+    .frame-item {
+        min-width: 50px;
+    }
+
+    /* Playback controls - minimal */
+    .playback-controls-bar {
+        padding: 6px;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #play-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+
+    #speed-slider {
+        width: 70px;
+    }
+
+    #speed-value {
+        font-size: 11px;
+    }
+
+    /* Modals - full screen on mobile */
+    .modal {
+        width: 95%;
+        max-width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .canvas-size-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .canvas-size-option {
+        padding: 12px;
+    }
+
+    .size-name {
+        font-size: 14px;
+    }
+
+    .size-dimensions {
+        font-size: 11px;
+    }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+    body {
+        grid-template-rows: auto 1fr minmax(60px, auto) minmax(45px, auto);
+    }
+
+    .app-logo {
+        font-size: 14px;
+    }
+
+    .menu-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    .tool-bar {
+        width: 45px;
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .tool-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .frames-section {
+        max-height: 60px;
+        min-height: 60px;
+    }
+
+    .preview-canvas {
+        width: 45px;
+        height: 45px;
+    }
+
+    .playback-controls-bar {
+        padding: 4px;
+        gap: 6px;
+    }
+
+    #play-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+    }
+
+    #speed-slider {
+        width: 60px;
+    }
+}
+
+/* Landscape mode adjustments */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    body {
+        grid-template-rows: auto 1fr minmax(50px, auto) minmax(40px, auto);
+    }
+
+    .frames-section {
+        max-height: 60px;
+        min-height: 50px;
+    }
+
+    .playback-controls-bar {
+        padding: 5px;
+    }
+
+    .tool-bar {
+        padding: 5px;
+        gap: 5px;
+    }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .tool-btn,
+    .menu-btn,
+    .color-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Disable hover effects on touch devices */
+    .tool-btn:hover,
+    .menu-btn:hover,
+    .color-btn:hover {
+        transform: none;
+    }
+
+    /* Active states for touch feedback */
+    .tool-btn:active,
+    .menu-btn:active {
+        transform: scale(0.95);
+    }
+}
