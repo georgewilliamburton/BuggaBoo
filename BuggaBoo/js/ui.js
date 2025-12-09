@@ -147,3 +147,16 @@ function checkUnsavedChanges(action, message = 'You have unsaved work. Would you
     action();
     return true;
 }
+
+// Shortcuts modal
+function showShortcutsModal() {
+    document.getElementById('shortcuts-modal').classList.add('show');
+    // Close dropdown menu
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('show');
+    });
+}
+
+function closeShortcutsModal() {
+    document.getElementById('shortcuts-modal').classList.remove('show');
+}

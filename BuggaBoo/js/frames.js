@@ -26,9 +26,18 @@ function saveFrame() {
     // Force canvas to render before capturing thumbnail
     canvas.renderAll();
     
+    // Capture lock states
+    const lockStates = {};
+    canvas.getObjects().forEach((obj, index) => {
+        if (obj.selectable === false) {
+            lockStates[index] = true;
+        }
+    });
+    
     const frameData = {
         json: canvas.toJSON(),                    // Fabric.js objects (for editing)
-        thumbnail: canvas.toDataURL('image/png')  // PNG image (for display)
+        thumbnail: canvas.toDataURL('image/png'), // PNG image (for display)
+        lockStates: lockStates                    // Lock states for objects
     };
     
     if (currentFrame >= 0 && currentFrame < frames.length) {
@@ -70,7 +79,29 @@ function addNewFrame() {
 // Helper function to load frame from JSON (preserves individual objects)
 function loadFrameFromJSON(frameData, callback) {
     canvas.loadFromJSON(frameData.json, function() {
+        // Reapply lock states if they exist
+        if (frameData.lockStates) {
+            canvas.getObjects().forEach((obj, index) => {
+                if (frameData.lockStates[index]) {
+                    obj.selectable = false;
+                    obj.evented = false;
+                    obj.hasControls = false;
+                    obj.hasBorders = false;
+                    obj.lockMovementX = true;
+                    obj.lockMovementY = true;
+                    obj.lockRotation = true;
+                    obj.lockScalingX = true;
+                    obj.lockScalingY = true;
+                }
+            });
+        }
+        
         canvas.renderAll();
+        
+        // Update layers panel if open to show lock states
+        if (document.getElementById('layers-panel').classList.contains('open')) {
+            updateLayersList();
+        }
         
         // Wait a tick for canvas to fully render, then update onion skin
         requestAnimationFrame(() => {
@@ -183,19 +214,29 @@ function duplicateCurrentFrame() {
     // Force canvas to render before capturing current state
     canvas.renderAll();
     
+    // Capture lock states before duplicating
+    const lockStates = {};
+    canvas.getObjects().forEach((obj, index) => {
+        if (obj.selectable === false) {
+            lockStates[index] = true;
+        }
+    });
+    
     // IMPORTANT: If we're on an existing frame, save it first to the frames array
     // This ensures the frames array is up to date before we duplicate
     if (currentFrame >= 0 && currentFrame < frames.length) {
         frames[currentFrame] = {
             json: canvas.toJSON(),
-            thumbnail: canvas.toDataURL('image/png')
+            thumbnail: canvas.toDataURL('image/png'),
+            lockStates: lockStates
         };
     }
     
     // Save current canvas state as the new duplicated frame (with JSON and thumbnail)
     const frameData = {
         json: canvas.toJSON(),
-        thumbnail: canvas.toDataURL('image/png')
+        thumbnail: canvas.toDataURL('image/png'),
+        lockStates: lockStates  // Preserve lock states in duplicate
     };
     
     // Add it as a new frame (don't overwrite the existing one)
@@ -204,7 +245,7 @@ function duplicateCurrentFrame() {
     // Move to the new duplicated frame
     currentFrame = frames.length - 1;
     
-    // Load the duplicated frame from JSON (preserves individual objects)
+    // Load the duplicated frame from JSON (preserves individual objects and lock states)
     loadFrameFromJSON(frameData, updateFramesDisplay);
 }
 
@@ -251,9 +292,18 @@ function loadFrame(index, isAutoPlayback = false) {
             // Force canvas to render before capturing thumbnail
             canvas.renderAll();
             
+            // Capture lock states
+            const lockStates = {};
+            canvas.getObjects().forEach((obj, index) => {
+                if (obj.selectable === false) {
+                    lockStates[index] = true;
+                }
+            });
+            
             const frameData = {
                 json: canvas.toJSON(),
-                thumbnail: canvas.toDataURL('image/png')
+                thumbnail: canvas.toDataURL('image/png'),
+                lockStates: lockStates
             };
             frames[currentFrame] = frameData;
         }

@@ -2,7 +2,7 @@
 // Handles draw, select, and eraser tools
 
 let currentColor = '#000000';
-let currentBrushSize = 8;
+let currentBrushSize = 4;
 let currentTool = 'draw';
 
 // Set tool

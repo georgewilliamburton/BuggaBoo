@@ -110,6 +110,36 @@
 - Automatically switches to select tool
 - Perfect for bulk operations and asset creation
 
+### Phase 14: Major UI and Feature Updates (December 2025)
+- **Windows Clipboard Integration:** 
+  - Paste images directly from Windows clipboard (Ctrl+V)
+  - Works with screenshots, Snipping Tool, Paint, browser images
+  - Images automatically scaled and centered on canvas
+- **Undo/Redo Buttons:**
+  - Added prominent ↶ ↷ buttons next to logo in top menu
+  - Grouped together with 2px gap for visual clarity
+- **File Menu Dropdown:**
+  - Reorganized top menu with File dropdown
+  - Grouped: New, Save Project, Load Project, Export
+  - Added Shortcuts item with keyboard shortcut reference modal
+- **Keyboard Shortcuts Modal:**
+  - Comprehensive shortcuts reference (File > Shortcuts)
+  - Three sections: Tools, Edit, Frames
+  - Clean, organized display with keyboard-style key indicators
+- **Object Lock Feature:**
+  - Lock/unlock objects via layers panel (🔒/🔓 button)
+  - Ctrl+L keyboard shortcut to toggle lock on selected objects
+  - Locked objects cannot be selected, moved, or modified
+  - Perfect for pinning reference images or background elements
+  - Lock state persists when duplicating frames
+  - Lock state independent of undo/redo (managed separately)
+- **Onion Skin Enhancement:**
+  - Changed from background to overlay rendering
+  - Now appears ABOVE locked frames for better tracing
+- **Default Brush Size:**
+  - Changed from Medium (8px) to Small (4px)
+  - Better default for detailed animation work
+
 ## Technical Architecture
 
 ### File Structure
@@ -145,7 +175,8 @@ BuggaBoo/
 frames = [
   {
     json: {...},        // Full Fabric.js canvas state
-    thumbnail: 'data:image/png...'  // Preview image
+    thumbnail: 'data:image/png...',  // Preview image
+    lockStates: {0: true, 2: true}  // Lock states by object index
   }
 ]
 ```
@@ -166,6 +197,7 @@ assets = [
 ```javascript
 undoStack = ['json1', 'json2', ...];  // Canvas states as JSON strings
 redoStack = ['json1', 'json2', ...];  // Redo states
+// Note: Lock states preserved separately during undo/redo
 ```
 
 ## Critical Bugs & Solutions
@@ -242,12 +274,17 @@ redoStack = ['json1', 'json2', ...];  // Redo states
 - **S** - Select tool
 - **F** - Fill tool
 - **L** - Toggle layers panel
-- **Space** - Add new frame
-- **Shift+Space** - Duplicate current frame
+- **N** - Add new frame
+- **Shift+N** - Duplicate current frame
+- **Space** - Play/pause animation
 - **Ctrl+Z** - Undo
 - **Ctrl+Shift+Z / Ctrl+Y** - Redo
-- **Ctrl+S** - Save frame
+- **Ctrl+S** - Save project
 - **Ctrl+A** - Select all objects
+- **Ctrl+C** - Copy selected objects
+- **Ctrl+V** - Paste objects or images from clipboard
+- **Ctrl+L** - Lock/unlock selected object
+- **Delete** - Delete selected objects
 
 ## Color Palette
 **Interface Colors:**

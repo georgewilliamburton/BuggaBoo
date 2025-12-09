@@ -71,8 +71,8 @@ function showOnionSkin() {
                 excludeFromExport: true
             });
             
-            // Use backgroundImage to render BEHIND current objects
-            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+            // Use overlayImage to render ABOVE all objects (including locked ones)
+            canvas.setOverlayImage(img, canvas.renderAll.bind(canvas), {
                 opacity: onionSkinOpacity
             });
         });
@@ -84,8 +84,7 @@ function showOnionSkin() {
 // Hide the onion skin overlay
 function hideOnionSkin() {
     if (canvas) {
-        canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-        canvas.backgroundColor = '#ffffff'; // Restore white background
+        canvas.setOverlayImage(null, canvas.renderAll.bind(canvas));
         canvas.renderAll();
     }
 }

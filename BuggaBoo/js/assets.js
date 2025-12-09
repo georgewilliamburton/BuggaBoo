@@ -26,6 +26,21 @@ function saveAssetsToStorage() {
     }
 }
 
+// Toggle file dropdown
+function toggleFileDropdown() {
+    const dropdown = document.getElementById('file-dropdown');
+    const isOpen = dropdown.classList.contains('show');
+    
+    // Close all dropdowns first
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('show');
+    });
+    
+    if (!isOpen) {
+        dropdown.classList.add('show');
+    }
+}
+
 // Toggle assets dropdown
 function toggleAssetsDropdown() {
     const dropdown = document.getElementById('assets-dropdown');

@@ -15,6 +15,34 @@ function initializeKeyboardShortcuts() {
         }
     });
 
+    // Handle paste from system clipboard (images from Windows clipboard)
+    document.addEventListener('paste', function(e) {
+        // Only handle if not typing in input field
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        const items = e.clipboardData?.items;
+        if (!items) {
+            // No clipboard data, try internal object paste
+            pasteObjects();
+            return;
+        }
+        
+        // Look for image in clipboard
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                e.preventDefault();
+                const blob = items[i].getAsFile();
+                pasteImageFromSystemClipboard(blob);
+                return;
+            }
+        }
+        
+        // No image found, use internal object paste
+        pasteObjects();
+    });
+
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         // Ignore if typing in an input or textarea
@@ -84,11 +112,9 @@ function initializeKeyboardShortcuts() {
             e.preventDefault();
             copySelectedObjects();
         }
-        // Ctrl/Cmd + V for paste objects
-        if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
-            e.preventDefault();
-            pasteObjects();
-        }
+        // Ctrl/Cmd + V for paste - handled by paste event listener
+        // (removed from here to allow system clipboard paste to work)
+        
         // N key for new frame
         if (e.key === 'n' && !e.shiftKey && !e.ctrlKey && !e.metaKey && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
@@ -103,6 +129,11 @@ function initializeKeyboardShortcuts() {
         if (e.key === 'Delete' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
             deleteSelectedObjects();
+        }
+        // Ctrl/Cmd + L to lock/unlock selected object
+        if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
+            e.preventDefault();
+            toggleSelectedObjectLock();
         }
     });
 }
@@ -234,4 +265,101 @@ function deleteSelectedObjects() {
     saveCanvasState();
     markAsChanged();
     updatePreview();
+}
+
+// Paste image from system clipboard (Windows clipboard, screenshots, etc.)
+function pasteImageFromSystemClipboard(blob) {
+    if (!blob) {
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        fabric.Image.fromURL(event.target.result, function(img) {
+            // Scale if image is too large for canvas
+            const maxWidth = canvas.width * 0.8;
+            const maxHeight = canvas.height * 0.8;
+            
+            if (img.width > maxWidth || img.height > maxHeight) {
+                const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+                img.scale(scale);
+            }
+            
+            // Center the image on canvas
+            img.set({
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                originX: 'center',
+                originY: 'center'
+            });
+            
+            canvas.add(img);
+            canvas.setActiveObject(img);
+            canvas.renderAll();
+            
+            // Switch to select tool so user can move/resize immediately
+            setTool('select');
+            
+            saveCanvasState();
+            markAsChanged();
+            updatePreview();
+        });
+    };
+    reader.readAsDataURL(blob);
+}
+
+// Toggle lock on selected object
+function toggleSelectedObjectLock() {
+    const activeObject = canvas.getActiveObject();
+    
+    if (!activeObject) {
+        showInfoModal('Nothing Selected', '⚠️ Please select an object to lock/unlock.', '⚠️');
+        return;
+    }
+    
+    // Handle multiple objects (activeSelection)
+    if (activeObject.type === 'activeSelection') {
+        const objects = activeObject.getObjects ? activeObject.getObjects() : [];
+        const newLockState = !objects[0].selectable; // Toggle based on first object's state
+        
+        objects.forEach(obj => {
+            obj.selectable = newLockState;
+            obj.evented = newLockState;
+            obj.hasControls = newLockState;
+            obj.hasBorders = newLockState;
+            obj.lockMovementX = !newLockState;
+            obj.lockMovementY = !newLockState;
+            obj.lockRotation = !newLockState;
+            obj.lockScalingX = !newLockState;
+            obj.lockScalingY = !newLockState;
+        });
+        
+        // Deselect after locking
+        if (!newLockState) {
+            canvas.discardActiveObject();
+        }
+    } else {
+        // Single object
+        const newLockState = !activeObject.selectable;
+        
+        activeObject.selectable = newLockState;
+        activeObject.evented = newLockState;
+        activeObject.hasControls = newLockState;
+        activeObject.hasBorders = newLockState;
+        activeObject.lockMovementX = !newLockState;
+        activeObject.lockMovementY = !newLockState;
+        activeObject.lockRotation = !newLockState;
+        activeObject.lockScalingX = !newLockState;
+        activeObject.lockScalingY = !newLockState;
+        
+        // Deselect after locking
+        if (!newLockState) {
+            canvas.discardActiveObject();
+        }
+    }
+    
+    canvas.renderAll();
+    updateLayersList();
+    // Don't call saveCanvasState() - lock states are managed separately
+    markAsChanged();
 }

@@ -279,3 +279,63 @@
 .asset-delete:hover {
     background: #c0392b;
 }
+
+/* Shortcuts Modal */
+.shortcuts-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.shortcuts-section h3 {
+    color: #3498db;
+    font-size: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    border-bottom: 2px solid #34495e;
+    padding-bottom: 8px;
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.shortcut-item:hover {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.shortcut-key {
+    background: #34495e;
+    color: #ecf0f1;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #445566;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    min-width: 80px;
+    text-align: center;
+}
+
+.shortcut-desc {
+    color: #bdc3c7;
+    font-size: 14px;
+    flex: 1;
+    margin-left: 15px;
+}
+
+/* Dropdown separator */
+.dropdown-separator {
+    height: 1px;
+    background: #34495e;
+    margin: 8px 0;
+}

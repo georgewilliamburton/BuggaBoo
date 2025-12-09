@@ -183,6 +183,7 @@ function clearCanvas() {
 let undoStack = [];
 let redoStack = [];
 let isUndoRedoing = false;
+let lockedObjects = new Map(); // Track locked objects by their ID
 
 // Save canvas state for undo
 function saveCanvasState() {
@@ -206,10 +207,41 @@ function saveCanvasState() {
     redoStack = [];
 }
 
+// Get lock states of all objects
+function getLockStates() {
+    const lockStates = {};
+    canvas.getObjects().forEach((obj, index) => {
+        if (obj.selectable === false) {
+            lockStates[index] = true;
+        }
+    });
+    return lockStates;
+}
+
+// Apply lock states to objects
+function applyLockStates(lockStates) {
+    canvas.getObjects().forEach((obj, index) => {
+        if (lockStates[index]) {
+            obj.selectable = false;
+            obj.evented = false;
+            obj.hasControls = false;
+            obj.hasBorders = false;
+            obj.lockMovementX = true;
+            obj.lockMovementY = true;
+            obj.lockRotation = true;
+            obj.lockScalingX = true;
+            obj.lockScalingY = true;
+        }
+    });
+}
+
 // Undo
 function undo() {
     if (undoStack.length > 0) {
         isUndoRedoing = true;
+        
+        // Save lock states before undo
+        const lockStates = getLockStates();
         
         // Save current state to redo stack
         redoStack.push(JSON.stringify(canvas.toJSON()));
@@ -219,6 +251,9 @@ function undo() {
         
         // Restore state
         canvas.loadFromJSON(state, () => {
+            // Reapply lock states after restore
+            applyLockStates(lockStates);
+            
             canvas.renderAll();
             isUndoRedoing = false;
             markAsChanged();
@@ -235,6 +270,9 @@ function redo() {
     if (redoStack.length > 0) {
         isUndoRedoing = true;
         
+        // Save lock states before redo
+        const lockStates = getLockStates();
+        
         // Save current state to undo stack
         undoStack.push(JSON.stringify(canvas.toJSON()));
         
@@ -243,6 +281,9 @@ function redo() {
         
         // Restore state
         canvas.loadFromJSON(state, () => {
+            // Reapply lock states after restore
+            applyLockStates(lockStates);
+            
             canvas.renderAll();
             isUndoRedoing = false;
             markAsChanged();

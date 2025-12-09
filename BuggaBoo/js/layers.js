@@ -167,6 +167,16 @@ function createLayerItem(obj, index) {
     const actions = document.createElement('div');
     actions.className = 'layer-actions';
     
+    // Lock toggle
+    const lockBtn = document.createElement('button');
+    lockBtn.className = 'layer-action-btn ' + (obj.selectable === false ? 'locked' : 'unlocked');
+    lockBtn.innerHTML = obj.selectable === false ? '🔒' : '🔓';
+    lockBtn.title = obj.selectable === false ? 'Unlock Layer' : 'Lock Layer';
+    lockBtn.onclick = (e) => {
+        e.stopPropagation();
+        toggleLayerLock(index);
+    };
+    
     // Visibility toggle
     const visibilityBtn = document.createElement('button');
     visibilityBtn.className = 'layer-action-btn ' + (obj.visible !== false ? 'visible' : 'hidden');
@@ -187,6 +197,7 @@ function createLayerItem(obj, index) {
         deleteLayer(index);
     };
     
+    actions.appendChild(lockBtn);
     actions.appendChild(visibilityBtn);
     actions.appendChild(deleteBtn);
     
@@ -238,6 +249,39 @@ function selectLayer(index) {
         canvas.setActiveObject(obj);
         canvas.renderAll();
         updateLayersList();
+    }
+}
+
+// Toggle layer lock
+function toggleLayerLock(index) {
+    const objects = canvas.getObjects();
+    const obj = objects[index];
+    
+    if (obj) {
+        const newLockState = !obj.selectable;
+        
+        obj.selectable = newLockState;
+        obj.evented = newLockState;
+        obj.hasControls = newLockState;
+        obj.hasBorders = newLockState;
+        obj.lockMovementX = !newLockState;
+        obj.lockMovementY = !newLockState;
+        obj.lockRotation = !newLockState;
+        obj.lockScalingX = !newLockState;
+        obj.lockScalingY = !newLockState;
+        
+        // If we're locking the currently selected object, deselect it
+        if (!newLockState) {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject === obj) {
+                canvas.discardActiveObject();
+            }
+        }
+        
+        canvas.renderAll();
+        updateLayersList();
+        // Don't call saveCanvasState() - lock states are managed separately
+        markAsChanged();
     }
 }
 

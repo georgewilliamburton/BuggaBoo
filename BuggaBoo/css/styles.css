@@ -85,6 +85,11 @@ body {
     background: #3d566e;
 }
 
+.undo-redo-group {
+    display: flex;
+    gap: 2px;
+}
+
 .separator {
     width: 1px;
     height: 20px;
