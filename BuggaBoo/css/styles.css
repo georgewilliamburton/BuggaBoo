@@ -423,6 +423,8 @@ body {
     display: flex;
     gap: 5px;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    max-width: 100px;
 }
 
 .layer-action-btn {
@@ -453,6 +455,97 @@ body {
 .layer-action-btn.hidden {
     color: #7f8c8d;
 }
+
+.layer-action-btn.global-btn.active {
+    color: #2ecc71;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Global layer dropdown */
+.global-dropdown-container {
+    position: relative;
+}
+
+.global-dropdown {
+    display: none;
+    position: fixed;
+    background: #34495e;
+    border: 2px solid #2ecc71;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10000;
+    min-width: 200px;
+    margin-top: 5px;
+}
+
+.global-dropdown.show {
+    display: flex;
+    flex-direction: column;
+}
+
+.global-option {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.global-option:hover {
+    background: #2ecc71;
+}
+
+.global-option.active {
+    background: rgba(46,204,113,0.3);
+    border-left: 3px solid #2ecc71;
+    font-weight: bold;
+}
+
+.global-option.active::after {
+    content: '✓';
+    position: absolute;
+    right: 10px;
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.global-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.global-option.disabled:hover {
+    background: transparent;
+}
+
+.global-option:not(:last-child) {
+    border-bottom: 1px solid #445566;
+}
+
+/* Global layer visual indicator */
+.layer-item.global-layer {
+    border-left: 3px solid #2ecc71;
+    background: linear-gradient(90deg, rgba(46,204,113,0.1) 0%, transparent 20%);
+}
+
+.layer-item.global-layer .layer-type::before {
+    content: '🌐 ';
+}
+
 
 /* Center Canvas Area */
 .canvas-area {

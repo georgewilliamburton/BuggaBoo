@@ -3,6 +3,44 @@
 
 let frames = [];
 let currentFrame = -1;
+let globalIdCounter = 1; // Counter for generating unique global IDs
+
+// Generate a unique global ID
+function generateGlobalId() {
+    return `global_${Date.now()}_${globalIdCounter++}`;
+}
+
+// Get the global layer data for an object by index
+function getObjectGlobalData(index) {
+    const objects = canvas.getObjects();
+    const obj = objects[index];
+    if (!obj) return null;
+    
+    return {
+        globalId: obj.globalId || null,
+        isGlobalLayer: obj.isGlobalLayer || false
+    };
+}
+
+// Check if the current frame is excluded for a global object
+function isFrameExcludedForGlobal(globalId, frameIndex) {
+    if (frameIndex < 0 || frameIndex >= frames.length) return false;
+    const frame = frames[frameIndex];
+    if (!frame.globalExclusions) return false;
+    return frame.globalExclusions.includes(globalId);
+}
+
+// Add current frame to exclusion list for a global object
+function excludeFrameFromGlobal(globalId) {
+    if (currentFrame < 0 || currentFrame >= frames.length) return;
+    const frame = frames[currentFrame];
+    if (!frame.globalExclusions) {
+        frame.globalExclusions = [];
+    }
+    if (!frame.globalExclusions.includes(globalId)) {
+        frame.globalExclusions.push(globalId);
+    }
+}
 
 // Update just the preview canvas (called during drawing)
 function updatePreview() {
@@ -26,7 +64,7 @@ function saveFrame() {
     // Force canvas to render before capturing thumbnail
     canvas.renderAll();
     
-    // Capture lock states
+    // Capture lock states and global layer data
     const lockStates = {};
     canvas.getObjects().forEach((obj, index) => {
         if (obj.selectable === false) {
@@ -35,10 +73,16 @@ function saveFrame() {
     });
     
     const frameData = {
-        json: canvas.toJSON(),                    // Fabric.js objects (for editing)
-        thumbnail: canvas.toDataURL('image/png'), // PNG image (for display)
-        lockStates: lockStates                    // Lock states for objects
+        json: canvas.toJSON(['globalId', 'isGlobalLayer']), // Include global properties
+        thumbnail: canvas.toDataURL('image/png'),
+        lockStates: lockStates,
+        globalExclusions: [] // Track which global objects are excluded from this frame
     };
+    
+    // Preserve existing global exclusions if frame already exists
+    if (currentFrame >= 0 && currentFrame < frames.length && frames[currentFrame].globalExclusions) {
+        frameData.globalExclusions = frames[currentFrame].globalExclusions;
+    }
     
     if (currentFrame >= 0 && currentFrame < frames.length) {
         // Update existing frame
@@ -226,17 +270,19 @@ function duplicateCurrentFrame() {
     // This ensures the frames array is up to date before we duplicate
     if (currentFrame >= 0 && currentFrame < frames.length) {
         frames[currentFrame] = {
-            json: canvas.toJSON(),
+            json: canvas.toJSON(['globalId', 'isGlobalLayer']),
             thumbnail: canvas.toDataURL('image/png'),
-            lockStates: lockStates
+            lockStates: lockStates,
+            globalExclusions: frames[currentFrame].globalExclusions || []
         };
     }
     
     // Save current canvas state as the new duplicated frame (with JSON and thumbnail)
     const frameData = {
-        json: canvas.toJSON(),
+        json: canvas.toJSON(['globalId', 'isGlobalLayer']),
         thumbnail: canvas.toDataURL('image/png'),
-        lockStates: lockStates  // Preserve lock states in duplicate
+        lockStates: lockStates,  // Preserve lock states in duplicate
+        globalExclusions: [] // New frame starts with no exclusions
     };
     
     // Add it as a new frame (don't overwrite the existing one)
@@ -301,9 +347,10 @@ function loadFrame(index, isAutoPlayback = false) {
             });
             
             const frameData = {
-                json: canvas.toJSON(),
+                json: canvas.toJSON(['globalId', 'isGlobalLayer']),
                 thumbnail: canvas.toDataURL('image/png'),
-                lockStates: lockStates
+                lockStates: lockStates,
+                globalExclusions: frames[currentFrame].globalExclusions || []
             };
             frames[currentFrame] = frameData;
         }

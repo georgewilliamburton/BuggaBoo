@@ -95,10 +95,15 @@ function createNewCanvas(width = 512, height = 512) {
             markAsChanged();
             updatePreview();
         });
-        canvas.on('object:modified', () => {
+        canvas.on('object:modified', (e) => {
             saveCanvasState();
             markAsChanged();
             updatePreview();
+            
+            // Sync global layers after modification is complete
+            if (e.target && e.target.isGlobalLayer && e.target.globalId) {
+                syncGlobalLayer(e.target);
+            }
         });
         canvas.on('object:removed', () => {
             // Don't save state here - we save before deletion in deleteLayer()
@@ -112,6 +117,14 @@ function createNewCanvas(width = 512, height = 512) {
         });
         canvas.on('after:render', () => {
             updatePreview();
+        });
+        
+        // Sync global layers on mouse:up (after drag complete)
+        canvas.on('mouse:up', () => {
+            const activeObject = canvas.getActiveObject();
+            if (activeObject && activeObject.isGlobalLayer && activeObject.globalId) {
+                syncGlobalLayer(activeObject);
+            }
         });
         
         // Handle fill tool clicks
@@ -189,7 +202,7 @@ let lockedObjects = new Map(); // Track locked objects by their ID
 function saveCanvasState() {
     if (isUndoRedoing) return;
     
-    const state = JSON.stringify(canvas.toJSON());
+    const state = JSON.stringify(canvas.toJSON(['globalId', 'isGlobalLayer']));
     
     // Don't save if it's the same as the last state
     if (undoStack.length > 0 && undoStack[undoStack.length - 1] === state) {
@@ -231,6 +244,7 @@ function applyLockStates(lockStates) {
             obj.lockRotation = true;
             obj.lockScalingX = true;
             obj.lockScalingY = true;
+            obj.erasable = false; // Locked objects can't be erased
         }
     });
 }
@@ -243,11 +257,19 @@ function undo() {
         // Save lock states before undo
         const lockStates = getLockStates();
         
-        // Save current state to redo stack
-        redoStack.push(JSON.stringify(canvas.toJSON()));
+        // Get current state
+        const currentState = JSON.stringify(canvas.toJSON(['globalId', 'isGlobalLayer']));
         
         // Get previous state
-        const state = undoStack.pop();
+        let state = undoStack.pop();
+        
+        // If current state matches the last undo state, pop again to get the actual previous state
+        if (state === currentState && undoStack.length > 0) {
+            state = undoStack.pop();
+        }
+        
+        // Save current state to redo stack
+        redoStack.push(currentState);
         
         // Restore state
         canvas.loadFromJSON(state, () => {
@@ -274,7 +296,7 @@ function redo() {
         const lockStates = getLockStates();
         
         // Save current state to undo stack
-        undoStack.push(JSON.stringify(canvas.toJSON()));
+        undoStack.push(JSON.stringify(canvas.toJSON(['globalId', 'isGlobalLayer'])));
         
         // Get next state
         const state = redoStack.pop();
@@ -293,4 +315,39 @@ function redo() {
             }
         });
     }
+}
+
+// Sync a global layer object to all frames
+function syncGlobalLayer(sourceObj) {
+    if (!sourceObj.globalId || !sourceObj.isGlobalLayer) return;
+    if (currentFrame < 0) return;
+    
+    const currentFrameIndex = currentFrame;
+    const sourceJson = sourceObj.toJSON(['globalId', 'isGlobalLayer']);
+    
+    // Loop through all frames and update matching global objects
+    frames.forEach((frame, frameIndex) => {
+        if (frameIndex === currentFrameIndex) return; // Skip current frame
+        
+        // Check if frame is excluded from this global object
+        if (frame.globalExclusions && frame.globalExclusions.includes(sourceObj.globalId)) {
+            return; // Skip excluded frames
+        }
+        
+        // Load frame temporarily
+        const tempJson = JSON.parse(JSON.stringify(frame.json));
+        
+        // Find object with matching globalId
+        if (tempJson.objects) {
+            const objIndex = tempJson.objects.findIndex(o => o.globalId === sourceObj.globalId);
+            
+            if (objIndex >= 0) {
+                // Update the object with new properties
+                tempJson.objects[objIndex] = sourceJson;
+                
+                // Update the frame data
+                frame.json = tempJson;
+            }
+        }
+    });
 }

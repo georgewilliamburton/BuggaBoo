@@ -3,6 +3,7 @@
 
 let currentColor = '#000000';
 let currentBrushSize = 4;
+let eraserBrushSize = 25; // Default eraser to largest size
 let currentTool = 'draw';
 
 // Set tool
@@ -15,32 +16,97 @@ function setTool(tool) {
 
     if (tool === 'draw') {
         canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
         canvas.freeDrawingBrush.color = currentColor;
+        canvas.freeDrawingBrush.width = currentBrushSize;
         canvas.defaultCursor = 'crosshair';
         canvas.selection = false;
+        // Deselect any selected objects
+        canvas.discardActiveObject();
+        // Make sure unlocked objects stay unlocked
+        canvas.forEachObject(obj => {
+            if (obj.lockMovementX !== true) {
+                obj.selectable = false;
+                obj.evented = true;
+            }
+        });
+        canvas.renderAll();
     } else if (tool === 'eraser') {
         canvas.isDrawingMode = true;
-        canvas.freeDrawingBrush.color = '#ffffff';
+        // Create a custom eraser brush that actually erases
+        const eraserBrush = new fabric.PencilBrush(canvas);
+        eraserBrush.width = eraserBrushSize;
+        eraserBrush.color = 'rgba(0,0,0,1)'; // Use black with full opacity
+        
+        // Override the brush to use destination-out composition (eraser mode)
+        const originalOnMouseDown = eraserBrush.onMouseDown.bind(eraserBrush);
+        const originalOnMouseUp = eraserBrush.onMouseUp.bind(eraserBrush);
+        
+        eraserBrush.onMouseDown = function(pointer, options) {
+            // Set eraser mode before drawing
+            canvas.contextTop.globalCompositeOperation = 'destination-out';
+            originalOnMouseDown(pointer, options);
+        };
+        
+        eraserBrush.onMouseUp = function(options) {
+            originalOnMouseUp(options);
+            // Reset composition mode after drawing
+            canvas.contextTop.globalCompositeOperation = 'source-over';
+            
+            // Apply erasing to the actual canvas objects
+            if (this._finalizeAndAddPath) {
+                const path = this._finalizeAndAddPath();
+                if (path) {
+                    // Set the path to erase mode
+                    path.globalCompositeOperation = 'destination-out';
+                    path.absolutePositioned = true;
+                }
+            }
+        };
+        
+        canvas.freeDrawingBrush = eraserBrush;
         canvas.defaultCursor = 'crosshair';
         canvas.selection = false;
+        // Deselect any selected objects
+        canvas.discardActiveObject();
+        // Make sure unlocked objects stay unlocked
+        canvas.forEachObject(obj => {
+            if (obj.lockMovementX !== true) {
+                obj.selectable = false;
+                obj.evented = true;
+            }
+        });
+        canvas.renderAll();
     } else if (tool === 'select') {
         canvas.isDrawingMode = false;
         canvas.defaultCursor = 'default';
         canvas.selection = true;
-        // Enable object selection
+        // Enable object selection (but respect locked objects)
         canvas.forEachObject(obj => {
-            obj.selectable = true;
-            obj.evented = true;
+            // Only make selectable if not locked (lockMovementX is our lock indicator)
+            if (obj.lockMovementX !== true) {
+                obj.selectable = true;
+                obj.evented = true;
+                // Ensure other properties are not in locked state
+                obj.hasControls = true;
+                obj.hasBorders = true;
+            }
         });
     } else if (tool === 'fill') {
         canvas.isDrawingMode = false;
         canvas.defaultCursor = 'pointer';
         canvas.selection = false;
+        // Deselect any selected objects
+        canvas.discardActiveObject();
         // Enable object detection for fill tool (but not selection)
         canvas.forEachObject(obj => {
-            obj.selectable = false;
-            obj.evented = true; // Keep evented=true so we can click on objects
+            // Don't override locked state
+            if (obj.lockMovementX !== true) {
+                obj.selectable = false;
+            }
+            obj.evented = true; // Keep evented=true so we can click on objects (even locked ones for fill)
         });
+        canvas.renderAll();
     }
 }
 
@@ -84,12 +150,21 @@ function updateBrushSizeColors() {
 }
 
 // Set brush size
-function setBrushSize(size) {
-    currentBrushSize = size;
+function setBrushSize(size, event) {
+    if (currentTool === 'eraser') {
+        eraserBrushSize = size;
+    } else {
+        currentBrushSize = size;
+    }
     
     // Update button states
     document.querySelectorAll('.brush-size-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    } else {
+        // Fallback if event not provided (called from onclick)
+        document.querySelector(`.brush-size-btn[onclick*="${size}"]`)?.classList.add('active');
+    }
 
     canvas.freeDrawingBrush.width = size;
 }
@@ -106,8 +181,13 @@ function selectAllObjects() {
         setTool('select');
     }
     
-    // Create active selection with all objects
-    const selection = new fabric.ActiveSelection(objects, {
+    // Filter out locked objects
+    const selectableObjects = objects.filter(obj => obj.lockMovementX !== true);
+    
+    if (selectableObjects.length === 0) return;
+    
+    // Create active selection with only unlocked objects
+    const selection = new fabric.ActiveSelection(selectableObjects, {
         canvas: canvas
     });
     
