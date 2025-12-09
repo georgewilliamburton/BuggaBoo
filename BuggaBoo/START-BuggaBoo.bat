@@ -1,3 +1,0 @@
-@echo off
-echo Starting BuggaBoo Studio...
-npm start

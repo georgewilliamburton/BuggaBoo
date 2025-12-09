@@ -64,7 +64,6 @@ function createLayerItem(obj, index) {
     
     // Drag and drop handlers on the entire item
     div.addEventListener('dragstart', (e) => {
-        console.log('Drag started from index:', index);
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', index.toString());
         div.classList.add('dragging');
@@ -75,7 +74,6 @@ function createLayerItem(obj, index) {
     });
     
     div.addEventListener('dragend', (e) => {
-        console.log('Drag ended');
         div.classList.remove('dragging');
         div.style.opacity = '1';
         // Remove drag-over from all items
@@ -108,14 +106,11 @@ function createLayerItem(obj, index) {
     div.addEventListener('drop', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Drop event fired!');
         
         div.classList.remove('drag-over');
         
         const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
         const toIndex = parseInt(div.getAttribute('data-index'));
-        
-        console.log('Drop: from', fromIndex, 'to', toIndex);
         
         if (fromIndex !== toIndex && !isNaN(fromIndex) && !isNaN(toIndex)) {
             reorderLayers(fromIndex, toIndex);
@@ -270,34 +265,6 @@ function deleteLayer(index) {
         saveCanvasState();
         
         canvas.remove(obj);
-        canvas.renderAll();
-        updateLayersList();
-        markAsChanged();
-        updatePreview();
-    }
-}
-
-// Move layer up in stack
-function moveLayerUp(index) {
-    const objects = canvas.getObjects();
-    const obj = objects[index];
-    
-    if (obj && index < objects.length - 1) {
-        canvas.moveTo(obj, index + 1);
-        canvas.renderAll();
-        updateLayersList();
-        markAsChanged();
-        updatePreview();
-    }
-}
-
-// Move layer down in stack
-function moveLayerDown(index) {
-    const objects = canvas.getObjects();
-    const obj = objects[index];
-    
-    if (obj && index > 0) {
-        canvas.moveTo(obj, index - 1);
         canvas.renderAll();
         updateLayersList();
         markAsChanged();

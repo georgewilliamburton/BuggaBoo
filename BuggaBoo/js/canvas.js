@@ -117,12 +117,24 @@ function createNewCanvas(width = 512, height = 512) {
         // Handle fill tool clicks
         canvas.on('mouse:down', (options) => {
             if (currentTool === 'fill') {
+                // Prevent default Fabric.js selection behavior
+                options.e.preventDefault();
+                
+                // Check if clicking on an object with fill property (shapes, paths)
                 if (options.target) {
                     // Fill the clicked object
                     options.target.set('fill', currentColor);
+                    if (options.target.stroke) {
+                        options.target.set('stroke', currentColor);
+                    }
                     canvas.renderAll();
+                    saveCanvasState();
                     markAsChanged();
                     updatePreview();
+                } else {
+                    // If not clicking on an object, try flood fill on canvas
+                    const pointer = canvas.getPointer(options.e);
+                    performFloodFill(Math.floor(pointer.x), Math.floor(pointer.y));
                 }
             }
         });
@@ -131,7 +143,6 @@ function createNewCanvas(width = 512, height = 512) {
         initializeLayersPanelListeners();
 
         updateFramesDisplay();
-        console.log(`Canvas created: ${width}×${height}`);
     };
 
     if (canvas && (hasUnsavedChanges || frames.length > 0 || canvas.getObjects().length > 0)) {
@@ -156,7 +167,6 @@ function createFullscreenCanvas() {
     const height = Math.floor(maxHeight);
     
     createNewCanvas(width, height);
-    console.log(`Fullscreen canvas created: ${width}×${height}`);
 }
 
 // Clear canvas

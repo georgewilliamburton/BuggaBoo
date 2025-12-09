@@ -1,6 +1,6 @@
 # BuggaBoo Animation Maker
 
-A child-friendly animation maker with separated, organized code structure.
+A child-friendly web-based animation maker. Simply open `index.html` in your browser to start creating animations!
 
 ## Project Structure
 
@@ -80,20 +80,30 @@ BuggaBoo/
 - Set up keyboard shortcuts
 - Initial UI state
 
+## How to Use
+
+**Simply double-click `index.html`** or open it in any modern web browser to start the application. No installation or server required!
+
 ## Features
 
 - **5 Brush Sizes**: 2px, 4px, 8px, 16px, 32px
 - **14 Colors**: 13 preset + custom color picker
 - **3 Tools**: Draw, Select, Eraser
 - **Rotation Controls**: Rotate selected objects with custom icon
-- **6 Canvas Presets**: Square, Cinema, Portrait, Wide, Large, YouTube
+- **6 Canvas Presets**: Square, Cinema, Portrait, Wide, Large, YouTube, Fullscreen
 - **Frame Management**: Save, load, export frames
+- **Layers Panel**: Drag-and-drop layer reordering
+- **Onion Skinning**: See previous frame while drawing
+- **Asset Library**: Save and reuse drawing objects
 - **Keyboard Shortcuts**: Quick access to common actions
-- **Unsaved Changes Warning**: Modal to prevent data loss
+- **Undo/Redo System**: Full history with 50-state memory
+- **No Installation Required**: Pure HTML/CSS/JavaScript web app
 
 ## Usage
 
-Open `index.html` in a web browser to start the application.
+**To Start:** Double-click `index.html` or open it in any web browser.
+
+**No server or installation needed!** All features work completely offline in your browser.
 
 ## Development
 

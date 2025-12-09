@@ -161,7 +161,6 @@ function updateFramesDisplay() {
         deleteCurrentFrame();
     };
 
-    // TODO: Button display order - change the order of these two lines to swap button positions
     actionsDiv.appendChild(deleteBtn);
     actionsDiv.appendChild(duplicateBtn);
 

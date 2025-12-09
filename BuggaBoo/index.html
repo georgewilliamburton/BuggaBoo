@@ -52,6 +52,16 @@
             <button class="tool-btn" id="fill-tool" onclick="setTool('fill')" title="Fill">🎨</button>
             <button class="tool-btn" id="eraser-tool" onclick="setTool('eraser')" title="Eraser">🧼</button>
             <div class="toolbar-separator"></div>
+            <div class="shapes-menu-container">
+                <button class="tool-btn" id="shapes-toggle" onclick="toggleShapesMenu()" title="Shapes">△</button>
+                <div class="shapes-menu" id="shapes-menu">
+                    <button class="shape-btn" onclick="addShape('rectangle')" title="Rectangle">⬜</button>
+                    <button class="shape-btn" onclick="addShape('circle')" title="Circle">⭕</button>
+                    <button class="shape-btn" onclick="addShape('triangle')" title="Triangle">△</button>
+                </div>
+            </div>
+            <div class="toolbar-separator"></div>
+            <button class="tool-btn" id="shadow-toggle" onclick="toggleShadow()" title="Toggle Shadow">🌑</button>
             <button class="tool-btn" id="onion-skin-toggle" onclick="toggleOnionSkin()" title="Onion Skin">🧅</button>
             <button class="tool-btn" id="layers-toggle" onclick="toggleLayersPanel()" title="Layers">📚</button>
         </div>

@@ -217,7 +217,6 @@ function autoSaveProject() {
         };
         
         localStorage.setItem('buggaboo_autosave', JSON.stringify(projectData));
-        console.log('Project auto-saved');
         
     } catch (error) {
         console.error('Auto-save failed:', error);

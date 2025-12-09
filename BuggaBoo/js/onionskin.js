@@ -98,11 +98,3 @@ function updateOnionSkin() {
         hideOnionSkin();
     }
 }
-
-// Adjust onion skin opacity (for future settings)
-function setOnionSkinOpacity(opacity) {
-    onionSkinOpacity = opacity;
-    if (onionSkinEnabled) {
-        showOnionSkin(); // Refresh with new opacity
-    }
-}

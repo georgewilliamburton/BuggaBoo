@@ -21,8 +21,6 @@ function initializeApp() {
     if (!hasAutoSave) {
         showCanvasSizeModal();
     }
-    
-    console.log('Animation Maker initialized!');
 }
 
 // Start the app when DOM is ready
