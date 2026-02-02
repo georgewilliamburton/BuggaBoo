@@ -74,7 +74,7 @@ function saveFrame() {
     
     const frameData = {
         json: canvas.toJSON(['globalId', 'isGlobalLayer']), // Include global properties
-        thumbnail: canvas.toDataURL('image/png'),
+        thumbnail: canvas.toDataURL('image/jpeg', 0.7), // JPEG at 70% quality saves memory
         lockStates: lockStates,
         globalExclusions: [] // Track which global objects are excluded from this frame
     };
@@ -104,9 +104,17 @@ function addNewFrame() {
         saveFrame();
     }
 
+    // Preserve global layers (locked layers that appear on all frames)
+    const globalLayers = objects.filter(obj => obj.isGlobalLayer === true);
+    
     // Clear canvas for new frame
     canvas.clear();
     canvas.backgroundColor = '#ffffff';
+    
+    // Re-add global layers to the new frame
+    globalLayers.forEach(obj => {
+        canvas.add(obj);
+    });
     
     currentFrame = frames.length;
     
@@ -271,7 +279,7 @@ function duplicateCurrentFrame() {
     if (currentFrame >= 0 && currentFrame < frames.length) {
         frames[currentFrame] = {
             json: canvas.toJSON(['globalId', 'isGlobalLayer']),
-            thumbnail: canvas.toDataURL('image/png'),
+            thumbnail: canvas.toDataURL('image/jpeg', 0.7),
             lockStates: lockStates,
             globalExclusions: frames[currentFrame].globalExclusions || []
         };
@@ -280,7 +288,7 @@ function duplicateCurrentFrame() {
     // Save current canvas state as the new duplicated frame (with JSON and thumbnail)
     const frameData = {
         json: canvas.toJSON(['globalId', 'isGlobalLayer']),
-        thumbnail: canvas.toDataURL('image/png'),
+        thumbnail: canvas.toDataURL('image/jpeg', 0.7),
         lockStates: lockStates,  // Preserve lock states in duplicate
         globalExclusions: [] // New frame starts with no exclusions
     };
@@ -348,7 +356,7 @@ function loadFrame(index, isAutoPlayback = false) {
             
             const frameData = {
                 json: canvas.toJSON(['globalId', 'isGlobalLayer']),
-                thumbnail: canvas.toDataURL('image/png'),
+                thumbnail: canvas.toDataURL('image/jpeg', 0.7),
                 lockStates: lockStates,
                 globalExclusions: frames[currentFrame].globalExclusions || []
             };
@@ -441,5 +449,37 @@ function recordAnimation(speed) {
         loadFrameFromJSON(frames[recordFrameIndex], () => {});
         recordFrameIndex++;
     }, 1000 / speed);
+}
+
+// Regenerate thumbnails for all frames (used after loading project)
+function regenerateAllThumbnails() {
+    if (frames.length === 0) return;
+    
+    const originalFrame = currentFrame;
+    let regeneratedCount = 0;
+    
+    // Process each frame
+    frames.forEach((frame, index) => {
+        // Skip if thumbnail already exists
+        if (frame.thumbnail && frame.thumbnail !== null) {
+            return;
+        }
+        
+        // Load frame temporarily to generate thumbnail
+        canvas.loadFromJSON(frame.json, function() {
+            canvas.renderAll();
+            // Generate thumbnail at reduced quality to save memory
+            frame.thumbnail = canvas.toDataURL('image/jpeg', 0.7);
+            regeneratedCount++;
+            
+            // After processing all frames, restore original frame
+            if (regeneratedCount + frames.filter(f => f.thumbnail).length >= frames.length) {
+                if (originalFrame >= 0 && originalFrame < frames.length) {
+                    loadFrame(originalFrame);
+                }
+                updateFramesDisplay();
+            }
+        });
+    });
 }
 

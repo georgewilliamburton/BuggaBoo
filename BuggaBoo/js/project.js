@@ -5,21 +5,28 @@ function saveProject() {
     // Ensure current frame is saved before exporting
     if (currentFrame >= 0 && currentFrame < frames.length) {
         frames[currentFrame] = {
-            json: canvas.toJSON(),
-            thumbnail: canvas.toDataURL('image/png')
+            json: canvas.toJSON(['globalId', 'isGlobalLayer']),
+            thumbnail: canvas.toDataURL('image/png'),
+            lockStates: frames[currentFrame].lockStates || {},
+            globalExclusions: frames[currentFrame].globalExclusions || []
         };
     }
     
-    // Create project data
+    // Create project data without thumbnails (they can be regenerated)
     const projectData = {
-        version: "1.0",
+        version: "1.1",
         created: new Date().toISOString(),
         canvasSize: {
             width: canvas.width,
             height: canvas.height,
             label: currentCanvasSize || 'Custom'
         },
-        frames: frames,
+        frames: frames.map(frame => ({
+            json: frame.json,
+            lockStates: frame.lockStates || {},
+            globalExclusions: frame.globalExclusions || []
+            // thumbnail excluded - will be regenerated on load
+        })),
         currentFrameIndex: currentFrame,
         // Include settings
         settings: {
@@ -29,7 +36,7 @@ function saveProject() {
     };
     
     // Convert to JSON and create download
-    const jsonString = JSON.stringify(projectData, null, 2);
+    const jsonString = JSON.stringify(projectData);
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     
@@ -43,7 +50,9 @@ function saveProject() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    showInfoModal('Project Saved', '✅ Your project has been saved successfully!');
+    // Calculate file size
+    const fileSizeKB = Math.round(blob.size / 1024);
+    showInfoModal('Project Saved', `✅ Your project has been saved!\n📊 ${frames.length} frames, ${fileSizeKB} KB`);
 }
 
 function loadProjectFromStartup() {
@@ -137,8 +146,14 @@ function applyLoadedProject(projectData) {
             canvas.renderAll();
         }
         
-        // Load frames
-        frames = projectData.frames;
+        // Load frames and regenerate missing thumbnails
+        frames = projectData.frames.map(frame => {
+            // If thumbnail is missing (new format), it will be generated when needed
+            if (!frame.thumbnail) {
+                frame.thumbnail = null; // Will be regenerated on display
+            }
+            return frame;
+        });
         
         // Load first frame or specified frame
         const frameToLoad = projectData.currentFrameIndex >= 0 && 
@@ -149,6 +164,9 @@ function applyLoadedProject(projectData) {
         if (frames.length > 0) {
             loadFrame(frameToLoad);
         }
+        
+        // Regenerate thumbnails for all frames
+        regenerateAllThumbnails();
         
         // Restore settings
         if (projectData.settings?.onionSkinEnabled && typeof toggleOnionSkin === 'function') {

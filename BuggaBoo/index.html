@@ -32,7 +32,9 @@
                     <button class="dropdown-item" onclick="showCanvasSizeModal()">📄 New</button>
                     <button class="dropdown-item" onclick="saveProject()">💾 Save Project</button>
                     <button class="dropdown-item" onclick="loadProject()">📂 Load Project</button>
-                    <button class="dropdown-item" onclick="exportAnimation()">📤 Export</button>
+                    <div class="dropdown-separator"></div>
+                    <button class="dropdown-item" onclick="exportAnimation()">📤 Export Frames (PNG)</button>
+                    <button class="dropdown-item" onclick="showVideoExportModal()">📹 Export to Video</button>
                     <div class="dropdown-separator"></div>
                     <button class="dropdown-item" onclick="showShortcutsModal()">⌨️ Shortcuts</button>
                 </div>
@@ -382,6 +384,7 @@
     <script src="js/assets.js"></script>
     <script src="js/layers.js"></script>
     <script src="js/project.js"></script>
+    <script src="js/video-export.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shortcuts.js"></script>
     <script src="js/init.js"></script>
