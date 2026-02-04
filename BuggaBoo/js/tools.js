@@ -1,14 +1,100 @@
 // Drawing Tools
 // Handles draw, select, and eraser tools
 
-let currentColor = '#000000';
-let currentBrushSize = 4;
-let eraserBrushSize = 25; // Default eraser to largest size
-let currentTool = 'draw';
+// ============================================
+// Phase 2: Architecture Integration
+// ============================================
+
+// Internal state (private)
+let _currentColor = '#000000';
+let _currentBrushSize = 4;
+let _eraserBrushSize = 25; // Default eraser to largest size
+let _currentTool = 'draw';
+
+// Get services from global scope
+function getEventBus() {
+    return window.eventBus;
+}
+
+function getStateManager() {
+    return window.stateManager;
+}
+
+// Backwards-compatible getters/setters that sync with StateManager
+Object.defineProperty(window, 'currentColor', {
+    get: function() { return _currentColor; },
+    set: function(value) {
+        const oldColor = _currentColor;
+        _currentColor = value;
+        if (getStateManager()) {
+            getStateManager().set('tool.color', value, true);
+        }
+        if (getEventBus() && oldColor !== value) {
+            getEventBus().emit('tool:color:changed', { 
+                oldColor: oldColor, 
+                newColor: value
+            });
+        }
+    }
+});
+
+Object.defineProperty(window, 'currentBrushSize', {
+    get: function() { return _currentBrushSize; },
+    set: function(value) {
+        const oldSize = _currentBrushSize;
+        _currentBrushSize = value;
+        if (getStateManager()) {
+            getStateManager().set('tool.brushSize', value, true);
+        }
+        if (getEventBus() && oldSize !== value) {
+            getEventBus().emit('tool:brushSize:changed', { 
+                oldSize: oldSize, 
+                newSize: value
+            });
+        }
+    }
+});
+
+Object.defineProperty(window, 'currentTool', {
+    get: function() { return _currentTool; },
+    set: function(value) {
+        const oldTool = _currentTool;
+        _currentTool = value;
+        if (getStateManager()) {
+            getStateManager().set('tool.current', value, true);
+        }
+        if (getEventBus() && oldTool !== value) {
+            getEventBus().emit('tool:changed', { 
+                oldTool: oldTool, 
+                newTool: value
+            });
+        }
+    }
+});
+
+Object.defineProperty(window, 'eraserBrushSize', {
+    get: function() { return _eraserBrushSize; },
+    set: function(value) { _eraserBrushSize = value; }
+});
+
+// Initialize tool state
+window.currentColor = '#000000';
+window.currentBrushSize = 4;
+window.eraserBrushSize = 25;
+window.currentTool = 'draw';
 
 // Set tool
 function setTool(tool) {
     currentTool = tool;
+    
+    // Emit tool changed event
+    if (getEventBus()) {
+        getEventBus().emit('tool:activated', { 
+            tool: tool,
+            color: currentColor,
+            brushSize: tool === 'eraser' ? eraserBrushSize : currentBrushSize
+        });
+    }
     
     // Update button states
     document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
@@ -114,6 +200,14 @@ function setTool(tool) {
 function setColor(color) {
     currentColor = color;
     
+    // Emit color changed event
+    if (getEventBus()) {
+        getEventBus().emit('tool:color:selected', { 
+            color: color,
+            source: 'palette'
+        });
+    }
+    
     // Update button states
     document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
@@ -129,6 +223,14 @@ function setColor(color) {
 // Set custom color from color picker
 function setCustomColor(color) {
     currentColor = color;
+    
+    // Emit color changed event
+    if (getEventBus()) {
+        getEventBus().emit('tool:color:selected', { 
+            color: color,
+            source: 'picker'
+        });
+    }
     
     // Update button states - mark the rainbow button as active
     document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
@@ -155,6 +257,14 @@ function setBrushSize(size, event) {
         eraserBrushSize = size;
     } else {
         currentBrushSize = size;
+    }
+    
+    // Emit brush size changed event
+    if (getEventBus()) {
+        getEventBus().emit('tool:brushSize:selected', { 
+            size: size,
+            tool: currentTool
+        });
     }
     
     // Update button states

@@ -8,8 +8,20 @@
     <!-- External Libraries -->
     <script src="lib/fabric.min.js"></script>
     <script src="lib/gif.js"></script>
+    <script src="lib/omggif.js"></script>
+    
+    <!-- Phase 1: Core Architecture (Load before app modules) -->
+    <script src="js/config/constants.js"></script>
+    <script src="js/core/ServiceContainer.js"></script>
+    <script src="js/core/EventBus.js"></script>
+    <script src="js/core/StateManager.js"></script>
+    <script src="js/interfaces/ICanvasRenderer.js"></script>
+    <script src="js/interfaces/ICanvasSerializer.js"></script>
+    <script src="js/interfaces/ICanvasObjectManager.js"></script>
+    <script src="js/adapters/FabricCanvasAdapter.js"></script>
     
     <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/modal.css">
 </head>
@@ -19,6 +31,7 @@
         <div class="app-logo">
             <span class="logo-bugga">Bugga</span><span class="logo-boo">Boo</span>
             <span class="logo-studio">Studio</span>
+            <span class="audio-indicator" id="audio-indicator" style="display: none;"></span>
         </div>
         <div class="undo-redo-group">
             <button class="menu-btn" onclick="undo()" title="Undo (Ctrl+Z)">↶</button>
@@ -32,6 +45,11 @@
                     <button class="dropdown-item" onclick="showCanvasSizeModal()">📄 New</button>
                     <button class="dropdown-item" onclick="saveProject()">💾 Save Project</button>
                     <button class="dropdown-item" onclick="loadProject()">📂 Load Project</button>
+                    <div class="dropdown-separator"></div>
+                    <button class="dropdown-item" onclick="importGIF()">🎞️ Import GIF</button>
+                    <button class="dropdown-item" onclick="importVideo()">🎬 Import Video</button>
+                    <div class="dropdown-separator"></div>
+                    <button class="dropdown-item" onclick="openAudioStudio()">🎵 Audio Studio</button>
                     <div class="dropdown-separator"></div>
                     <button class="dropdown-item" onclick="exportAnimation()">📤 Export Frames (PNG)</button>
                     <button class="dropdown-item" onclick="showVideoExportModal()">📹 Export to Video</button>
@@ -140,8 +158,8 @@
         <button class="playback-btn" id="play-btn" onclick="togglePlayback()" title="Play Animation">▶️</button>
         <div class="speed-control">
             <label class="speed-label">Speed:</label>
-            <input type="range" id="speed-slider" min="1" max="10" value="5" oninput="updatePlaybackSpeed(this.value)">
-            <span class="speed-value" id="speed-value">5 FPS</span>
+            <input type="range" id="speed-slider" min="1" max="60" value="12" oninput="updatePlaybackSpeed(this.value)">
+            <span class="speed-value" id="speed-value">12 FPS</span>
         </div>
     </div>
 
@@ -376,15 +394,29 @@
     </div>
 
     <!-- JavaScript Modules -->
+    <script src="js/logger.js"></script>
     <script src="js/canvas.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/frames.js"></script>
     <script src="js/playback.js"></script>
     <script src="js/onionskin.js"></script>
     <script src="js/assets.js"></script>
-    <script src="js/layers.js"></script>
+    
+    <!-- Phase 3: Split layers modules -->
+    <script src="js/layers/layers-panel.js"></script>
+    <script src="js/layers/layer-operations.js"></script>
+    <script src="js/layers/global-layers.js"></script>
+    
     <script src="js/project.js"></script>
+    
+    <!-- Phase 3: Split media import modules -->
+    <script src="js/media/gif-decoder.js"></script>
+    <script src="js/media/video-decoder.js"></script>
+    <script src="js/media/gif-import.js"></script>
+    <script src="js/media/video-import.js"></script>
+    <script src="js/media/import-controller.js"></script>
     <script src="js/video-export.js"></script>
+    <script src="js/audio-bridge.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shortcuts.js"></script>
     <script src="js/init.js"></script>

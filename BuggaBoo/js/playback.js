@@ -1,10 +1,23 @@
 // Animation Playback System
 // Play through frames with adjustable speed
 
+// ============================================
+// Phase 2: Architecture Integration
+// ============================================
+
 let isPlaying = false;
 let playbackInterval = null;
-let playbackSpeed = 5; // frames per second (FPS)
+let playbackSpeed = 12; // frames per second (FPS)
 let currentPlaybackFrame = 0;
+
+// Get services
+function getEventBus() {
+    return window.eventBus;
+}
+
+function getStateManager() {
+    return window.stateManager;
+}
 
 // Toggle playback on/off
 function togglePlayback() {
@@ -23,6 +36,19 @@ function startPlayback() {
     }
     
     isPlaying = true;
+    
+    // Update state manager
+    if (getStateManager()) {
+        getStateManager().set('animation.playing', true, true);
+    }
+    
+    // Emit event
+    if (getEventBus()) {
+        getEventBus().emit('playback:started', {
+            fps: playbackSpeed,
+            frameCount: frames.length
+        });
+    }
     
     // Update button appearance
     const playBtn = document.getElementById('play-btn');
@@ -60,6 +86,18 @@ function startPlayback() {
 function stopPlayback() {
     isPlaying = false;
     
+    // Update state manager
+    if (getStateManager()) {
+        getStateManager().set('animation.playing', false, true);
+    }
+    
+    // Emit event
+    if (getEventBus()) {
+        getEventBus().emit('playback:stopped', {
+            currentFrame: currentPlaybackFrame
+        });
+    }
+    
     // Clear interval
     if (playbackInterval) {
         clearInterval(playbackInterval);
@@ -76,6 +114,18 @@ function stopPlayback() {
 // Update playback speed from slider
 function updatePlaybackSpeed(value) {
     playbackSpeed = parseInt(value);
+    
+    // Update state manager
+    if (getStateManager()) {
+        getStateManager().set('animation.fps', playbackSpeed, true);
+    }
+    
+    // Emit event
+    if (getEventBus()) {
+        getEventBus().emit('playback:speed:changed', {
+            fps: playbackSpeed
+        });
+    }
     
     // Update display
     document.getElementById('speed-value').textContent = playbackSpeed + ' FPS';

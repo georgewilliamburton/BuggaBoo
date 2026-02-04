@@ -28,6 +28,11 @@ function createNewCanvas(width = 512, height = 512) {
             isDrawingMode: true
         });
 
+        // Register canvas with Phase 1 architecture (if available)
+        if (typeof registerCanvasAdapter === 'function') {
+            registerCanvasAdapter(canvas);
+        }
+
         // Set initial brush
         canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
         canvas.freeDrawingBrush.color = currentColor;

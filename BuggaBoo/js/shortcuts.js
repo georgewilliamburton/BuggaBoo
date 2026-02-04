@@ -135,7 +135,37 @@ function initializeKeyboardShortcuts() {
             e.preventDefault();
             toggleSelectedObjectLock();
         }
+        // Arrow Left - Previous frame
+        if (e.key === 'ArrowLeft' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            navigateToPreviousFrame();
+        }
+        // Arrow Right - Next frame
+        if (e.key === 'ArrowRight' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            navigateToNextFrame();
+        }
     });
+}
+
+// Navigate to previous frame
+function navigateToPreviousFrame() {
+    if (currentFrame > 0) {
+        loadFrame(currentFrame - 1);
+    } else if (frames.length > 0) {
+        // Wrap around to last frame
+        loadFrame(frames.length - 1);
+    }
+}
+
+// Navigate to next frame
+function navigateToNextFrame() {
+    if (currentFrame < frames.length - 1) {
+        loadFrame(currentFrame + 1);
+    } else if (frames.length > 0) {
+        // Wrap around to first frame
+        loadFrame(0);
+    }
 }
 
 // Copy selected objects to clipboard

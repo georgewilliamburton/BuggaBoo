@@ -1,9 +1,76 @@
 // Frame Management
 // Handles creating, saving, loading, and exporting frames
 
-let frames = [];
-let currentFrame = -1;
+// ============================================
+// Phase 2: Architecture Integration
+// ============================================
+
+// Internal state (private)
+let _frames = [];
+let _currentFrame = -1;
 let globalIdCounter = 1; // Counter for generating unique global IDs
+let _selectedFrames = new Set(); // Track multi-selected frames
+
+// Get services from global scope (initialized in init.js)
+function getEventBus() {
+    return window.eventBus;
+}
+
+function getStateManager() {
+    return window.stateManager;
+}
+
+function getCanvasAdapter() {
+    try {
+        return window.serviceContainer ? window.serviceContainer.get('canvas') : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Backwards-compatible getters/setters that sync with StateManager
+Object.defineProperty(window, 'frames', {
+    get: function() { return _frames; },
+    set: function(value) {
+        _frames = value;
+        if (getStateManager()) {
+            getStateManager().set('frames.count', value.length, true);
+        }
+    }
+});
+
+Object.defineProperty(window, 'currentFrame', {
+    get: function() { return _currentFrame; },
+    set: function(value) {
+        const oldFrame = _currentFrame;
+        _currentFrame = value;
+        if (getStateManager()) {
+            getStateManager().set('animation.currentFrame', value, true);
+        }
+        if (getEventBus() && oldFrame !== value) {
+            getEventBus().emit('frame:changed', { 
+                oldFrame: oldFrame, 
+                newFrame: value,
+                totalFrames: _frames.length
+            });
+        }
+    }
+});
+
+Object.defineProperty(window, 'selectedFrames', {
+    get: function() { return _selectedFrames; },
+    set: function(value) {
+        _selectedFrames = value;
+        if (getStateManager()) {
+            getStateManager().set('frames.selected', Array.from(value), true);
+        }
+    }
+});
+
+// Initialize frames state
+window.frames = [];
+window.currentFrame = -1;
+window.selectedFrames = new Set();
 
 // Generate a unique global ID
 function generateGlobalId() {
@@ -84,13 +151,27 @@ function saveFrame() {
         frameData.globalExclusions = frames[currentFrame].globalExclusions;
     }
     
+    const isNewFrame = !(currentFrame >= 0 && currentFrame < frames.length);
+    
     if (currentFrame >= 0 && currentFrame < frames.length) {
         // Update existing frame
         frames[currentFrame] = frameData;
+        if (getEventBus()) {
+            getEventBus().emit('frame:updated', { 
+                frameIndex: currentFrame,
+                frameCount: frames.length
+            });
+        }
     } else {
         // Add new frame
         frames.push(frameData);
         currentFrame = frames.length - 1;
+        if (getEventBus()) {
+            getEventBus().emit('frame:added', { 
+                frameIndex: currentFrame,
+                frameCount: frames.length
+            });
+        }
     }
     
     updateFramesDisplay();
@@ -117,6 +198,14 @@ function addNewFrame() {
     });
     
     currentFrame = frames.length;
+    
+    if (getEventBus()) {
+        getEventBus().emit('frame:created', { 
+            frameIndex: currentFrame,
+            frameCount: frames.length,
+            hasGlobalLayers: globalLayers.length > 0
+        });
+    }
     
     // Update onion skin for the new frame (after clear settles)
     setTimeout(() => {
@@ -173,8 +262,8 @@ function updateFramesDisplay() {
 
     frames.forEach((frame, index) => {
         const frameDiv = document.createElement('div');
-        frameDiv.className = 'frame' + (index === currentFrame ? ' active' : '');
-        frameDiv.onclick = () => loadFrame(index);
+        frameDiv.className = 'frame' + (index === currentFrame ? ' active' : '') + (selectedFrames.has(index) ? ' selected' : '');
+        frameDiv.onclick = (e) => handleFrameClick(index, e);
 
         const img = document.createElement('img');
         img.src = frame.thumbnail;  // Use thumbnail for display
@@ -183,8 +272,48 @@ function updateFramesDisplay() {
         frameNumber.className = 'frame-number';
         frameNumber.textContent = index + 1;
 
+        // Selection checkbox
+        const checkbox = document.createElement('div');
+        checkbox.className = 'frame-checkbox';
+        checkbox.innerHTML = selectedFrames.has(index) ? '✓' : '';
+        checkbox.onclick = (e) => {
+            e.stopPropagation();
+            toggleFrameSelection(index);
+        };
+
+        // Action buttons for each frame
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'frame-actions';
+
+        const duplicateBtn = document.createElement('button');
+        duplicateBtn.className = 'frame-btn duplicate';
+        duplicateBtn.innerHTML = '📋';
+        duplicateBtn.title = 'Duplicate Frame';
+        duplicateBtn.onclick = (e) => {
+            e.stopPropagation();
+            duplicateFrame(index);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'frame-btn delete';
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.title = 'Delete Frame';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (selectedFrames.size > 0 && selectedFrames.has(index)) {
+                deleteSelectedFrames();
+            } else {
+                deleteFrame(index);
+            }
+        };
+
+        actionsDiv.appendChild(duplicateBtn);
+        actionsDiv.appendChild(deleteBtn);
+
+        frameDiv.appendChild(checkbox);
         frameDiv.appendChild(img);
         frameDiv.appendChild(frameNumber);
+        frameDiv.appendChild(actionsDiv);
         container.appendChild(frameDiv);
     });
 
@@ -331,6 +460,163 @@ function deleteCurrentFrame() {
     });
 }
 
+// Delete a specific frame by index
+function deleteFrame(index) {
+    if (index < 0 || index >= frames.length) return;
+    
+    showDeleteModal(index + 1, () => {
+        frames.splice(index, 1);
+        
+        if (getEventBus()) {
+            getEventBus().emit('frame:deleted', { 
+                frameIndex: index,
+                frameCount: frames.length
+            });
+        }
+        
+        // Adjust current frame index if needed
+        if (frames.length === 0) {
+            currentFrame = -1;
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff';
+            canvas.renderAll();
+        } else {
+            // If we deleted a frame before the current one, adjust index
+            if (index < currentFrame) {
+                currentFrame--;
+            } 
+            // If we deleted the current frame, load the same index (which is now the next frame)
+            else if (index === currentFrame) {
+                if (currentFrame >= frames.length) {
+                    currentFrame = frames.length - 1;
+                }
+                if (currentFrame >= 0) {
+                    loadFrameFromJSON(frames[currentFrame]);
+                }
+            }
+            // If we deleted after current frame, no need to change anything
+        }
+        
+        updateFramesDisplay();
+    });
+}
+
+// Duplicate a specific frame by index
+function duplicateFrame(index) {
+    if (index < 0 || index >= frames.length) return;
+    
+    const frameToDuplicate = frames[index];
+    
+    // Create a deep copy of the frame
+    const duplicatedFrame = {
+        json: JSON.parse(JSON.stringify(frameToDuplicate.json)),
+        thumbnail: frameToDuplicate.thumbnail,
+        lockStates: JSON.parse(JSON.stringify(frameToDuplicate.lockStates || {})),
+        globalExclusions: []
+    };
+    
+    // Insert the duplicate right after the original
+    frames.splice(index + 1, 0, duplicatedFrame);
+    
+    if (getEventBus()) {
+        getEventBus().emit('frame:duplicated', { 
+            originalIndex: index,
+            newIndex: index + 1,
+            frameCount: frames.length
+        });
+    }
+    
+    // Move to the duplicated frame
+    currentFrame = index + 1;
+    loadFrameFromJSON(duplicatedFrame, updateFramesDisplay);
+}
+
+// Handle frame click with multi-select support
+function handleFrameClick(index, event) {
+    if (event.ctrlKey || event.metaKey) {
+        // Ctrl+Click: Toggle selection
+        toggleFrameSelection(index);
+    } else if (event.shiftKey && selectedFrames.size > 0) {
+        // Shift+Click: Select range
+        const indices = Array.from(selectedFrames);
+        const lastSelected = Math.max(...indices);
+        const start = Math.min(lastSelected, index);
+        const end = Math.max(lastSelected, index);
+        
+        selectedFrames.clear();
+        for (let i = start; i <= end; i++) {
+            selectedFrames.add(i);
+        }
+        updateFramesDisplay();
+    } else {
+        // Normal click: Load frame and clear selection
+        selectedFrames.clear();
+        loadFrame(index);
+    }
+}
+
+// Toggle selection of a single frame
+function toggleFrameSelection(index) {
+    if (selectedFrames.has(index)) {
+        selectedFrames.delete(index);
+    } else {
+        selectedFrames.add(index);
+    }
+    
+    if (getEventBus()) {
+        getEventBus().emit('frame:selection:changed', { 
+            selectedFrames: Array.from(selectedFrames),
+            selectedCount: selectedFrames.size
+        });
+    }
+    
+    updateFramesDisplay();
+}
+
+// Delete all selected frames
+function deleteSelectedFrames() {
+    if (selectedFrames.size === 0) return;
+    
+    const count = selectedFrames.size;
+    const frameNumbers = Array.from(selectedFrames).sort((a, b) => a - b).map(i => i + 1).join(', ');
+    
+    showDeleteModal(`frames ${frameNumbers}`, () => {
+        // Convert to array and sort in reverse order to delete from end to start
+        const indicesToDelete = Array.from(selectedFrames).sort((a, b) => b - a);
+        
+        indicesToDelete.forEach(index => {
+            frames.splice(index, 1);
+        });
+        
+        if (getEventBus()) {
+            getEventBus().emit('frames:bulk:deleted', { 
+                deletedCount: count,
+                frameCount: frames.length
+            });
+        }
+        
+        selectedFrames.clear();
+        
+        // Adjust current frame
+        if (frames.length === 0) {
+            currentFrame = -1;
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff';
+            canvas.renderAll();
+        } else {
+            // Move to a valid frame
+            if (currentFrame >= frames.length) {
+                currentFrame = frames.length - 1;
+            }
+            if (currentFrame >= 0) {
+                loadFrameFromJSON(frames[currentFrame]);
+            }
+        }
+        
+        updateFramesDisplay();
+    });
+}
+
 // Load a specific frame
 function loadFrame(index, isAutoPlayback = false) {
     if (index >= 0 && index < frames.length) {
@@ -365,7 +651,23 @@ function loadFrame(index, isAutoPlayback = false) {
 
         // Load selected frame from JSON (preserves individual objects)
         currentFrame = index;
-        loadFrameFromJSON(frames[index], updateFramesDisplay);
+        
+        if (getEventBus()) {
+            getEventBus().emit('frame:loading', { 
+                frameIndex: index,
+                frameCount: frames.length
+            });
+        }
+        
+        loadFrameFromJSON(frames[index], () => {
+            if (getEventBus()) {
+                getEventBus().emit('frame:loaded', { 
+                    frameIndex: index,
+                    frameCount: frames.length
+                });
+            }
+            updateFramesDisplay();
+        });
     }
 }
 
