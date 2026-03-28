@@ -19,10 +19,12 @@ function initializeServices() {
     // Create and register event bus
     eventBus = new EventBus(false); // Set to true for debug mode
     serviceContainer.register('eventBus', eventBus, true);
-    
+    window.eventBus = eventBus; // expose on window so all modules can reach it
+
     // Create and register state manager
     stateManager = new StateManager(eventBus);
     serviceContainer.register('stateManager', stateManager, true);
+    window.stateManager = stateManager;
     
     // Initialize application state
     stateManager.set('app.initialized', false);
@@ -80,7 +82,12 @@ function initializeApp() {
     
     // Initialize assets system
     initializeAssets();
-    
+
+    // Initialize audio tracks panel
+    if (typeof initAudioTracks === 'function') {
+        initAudioTracks();
+    }
+
     // Start auto-save system
     startAutoSave();
     

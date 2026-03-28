@@ -32,7 +32,9 @@ function saveProject() {
         settings: {
             onionSkinEnabled: onionSkinEnabled || false,
             backgroundColor: canvas.backgroundColor || '#ffffff'
-        }
+        },
+        // Audio tracks (base64 audio data included in save file)
+        audioTracks: (typeof getAudioTracksForSave === 'function') ? getAudioTracksForSave() : []
     };
     
     // Convert to JSON and create download
@@ -177,13 +179,20 @@ function applyLoadedProject(projectData) {
         
         // Update UI
         updateFramesDisplay();
-        
+
+        // Load audio tracks from project file (async, non-blocking)
+        if (typeof loadAudioTracksFromSave === 'function') {
+            loadAudioTracksFromSave(projectData.audioTracks || []);
+        }
+        // Sync audio auto-save to match the loaded project
+        if (typeof _audioAutoSave === 'function') _audioAutoSave();
+
         // Reset undo/redo stacks (clear history for fresh start)
         if (typeof undoStack !== 'undefined') {
             undoStack = [];
             redoStack = [];
         }
-        
+
         showInfoModal('Project Loaded', `✅ Project loaded successfully!\n📊 ${frames.length} frames restored`);
         
     } catch (error) {
@@ -208,32 +217,39 @@ function applyLoadedProject(projectData) {
 }
 
 // Export current project to localStorage (auto-save)
+// Audio tracks are saved separately via audioAutoSave() in audio-tracks.js.
 function autoSaveProject() {
     try {
-        // Ensure current frame is saved
+        // Ensure current frame is saved (no thumbnail — regenerated on restore)
         if (currentFrame >= 0 && currentFrame < frames.length) {
             frames[currentFrame] = {
-                json: canvas.toJSON(),
-                thumbnail: canvas.toDataURL('image/png')
+                json: canvas.toJSON(['globalId', 'isGlobalLayer']),
+                lockStates: frames[currentFrame].lockStates || {},
+                globalExclusions: frames[currentFrame].globalExclusions || []
             };
         }
-        
+
         const projectData = {
-            version: "1.0",
+            version: "1.1",
             saved: new Date().toISOString(),
             canvasSize: {
                 width: canvas.width,
                 height: canvas.height,
                 label: currentCanvasSize || 'Custom'
             },
-            frames: frames,
+            frames: frames.map(frame => ({
+                json: frame.json,
+                lockStates: frame.lockStates || {},
+                globalExclusions: frame.globalExclusions || []
+                // thumbnails excluded — regenerated on restore
+            })),
             currentFrameIndex: currentFrame,
             settings: {
                 onionSkinEnabled: onionSkinEnabled || false,
                 backgroundColor: canvas.backgroundColor || '#ffffff'
             }
         };
-        
+
         localStorage.setItem('buggaboo_autosave', JSON.stringify(projectData));
         
     } catch (error) {

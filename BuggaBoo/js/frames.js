@@ -266,7 +266,7 @@ function updateFramesDisplay() {
         frameDiv.onclick = (e) => handleFrameClick(index, e);
 
         const img = document.createElement('img');
-        img.src = frame.thumbnail;  // Use thumbnail for display
+        if (frame.thumbnail) img.src = frame.thumbnail;
 
         const frameNumber = document.createElement('div');
         frameNumber.className = 'frame-number';
@@ -385,9 +385,23 @@ function updateFramesDisplay() {
         container.appendChild(addBtn);
     }
 
-    // Auto-scroll to show the newest frame and add button
+    // Scroll only enough to keep the active frame in view — don't force-jump to the end
     const framesStrip = container.parentElement;
-    framesStrip.scrollLeft = framesStrip.scrollWidth;
+    const activeEl = container.querySelector('.frame.active');
+    if (activeEl) {
+        const stripLeft  = framesStrip.scrollLeft;
+        const stripRight = stripLeft + framesStrip.clientWidth;
+        const frameLeft  = activeEl.offsetLeft;
+        const frameRight = frameLeft + activeEl.offsetWidth;
+        if (frameRight > stripRight) {
+            framesStrip.scrollLeft = frameRight - framesStrip.clientWidth + 8;
+        } else if (frameLeft < stripLeft) {
+            framesStrip.scrollLeft = frameLeft - 8;
+        }
+    } else {
+        // No active frame yet (e.g. first load) — scroll to end to show the + button
+        framesStrip.scrollLeft = framesStrip.scrollWidth;
+    }
 }
 
 // Duplicate current frame

@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/audio-tracks.css">
 </head>
 <body>
     <!-- Top Menu -->
@@ -168,6 +169,23 @@
         <div class="frames-container-inner" id="frames-container">
             <!-- Frames will be added here dynamically -->
             <button class="add-frame-btn" onclick="addNewFrame()" title="Add Frame">+</button>
+        </div>
+    </div>
+
+    <!-- Audio Tracks Panel -->
+    <div class="audio-section" id="audio-section">
+        <div class="at-header">
+            <span class="at-header-title">🎵 Audio Tracks</span>
+            <button class="at-header-btn" onclick="addEmptyAudioTrack()" title="Add a blank audio track">+ Track</button>
+            <button class="at-header-btn" onclick="importAudioFile(null)" title="Import an audio file as a new track">📁 Import</button>
+            <button class="at-toggle-btn" id="audio-toggle-btn" onclick="toggleAudioPanel()" title="Collapse/expand">▲</button>
+        </div>
+        <div class="at-panel-body" id="audio-panel-body">
+            <div class="at-ruler" id="audio-timeline-ruler"></div>
+            <div class="at-tracks-list" id="audio-tracks-list"></div>
+            <div class="at-drop-hint" id="audio-drop-hint">
+                Drop audio files here &nbsp;·&nbsp; or click <strong>+ Track</strong> / <strong>📁 Import</strong>
+            </div>
         </div>
     </div>
 
@@ -416,7 +434,7 @@
     <script src="js/media/video-import.js"></script>
     <script src="js/media/import-controller.js"></script>
     <script src="js/video-export.js"></script>
-    <script src="js/audio-bridge.js"></script>
+    <script src="js/audio-tracks.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/shortcuts.js"></script>
     <script src="js/init.js"></script>

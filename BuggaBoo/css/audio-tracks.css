@@ -1,0 +1,291 @@
+/* Audio Track Panel — BuggaBoo Studio */
+
+/* ─── Section wrapper ─── */
+.audio-section {
+    background: var(--color-dark-900);
+    border-top: 2px solid var(--color-dark-600);
+    flex-shrink: 0;
+    user-select: none;
+}
+
+/* ─── Header bar ─── */
+.at-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 5px var(--spacing-md);
+    background: var(--color-dark-800);
+    border-bottom: 1px solid var(--color-dark-600);
+    min-height: 34px;
+}
+
+.at-header-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-neutral-200);
+    letter-spacing: 0.5px;
+    margin-right: auto;
+}
+
+.at-header-btn {
+    background: var(--color-dark-700);
+    border: 1px solid var(--color-dark-600);
+    color: var(--color-neutral-200);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background var(--transition-normal);
+    white-space: nowrap;
+}
+
+.at-header-btn:hover {
+    background: var(--color-dark-500);
+    color: #fff;
+}
+
+.at-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-neutral-300);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+.at-toggle-btn:hover { color: #fff; }
+
+/* ─── Panel body ─── */
+.at-panel-body {
+    overflow: hidden;
+}
+
+.at-panel-body.drag-over {
+    outline: 2px dashed var(--color-primary-blue);
+    outline-offset: -2px;
+}
+
+/* ─── Timeline ruler ─── */
+.at-ruler {
+    position: relative;
+    height: 20px;
+    background: var(--color-dark-800);
+    border-bottom: 1px solid var(--color-dark-600);
+    margin-left: 220px; /* align with timeline area */
+    overflow: hidden;
+}
+
+.at-ruler-tick {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.at-ruler-line {
+    width: 1px;
+    height: 8px;
+    background: var(--color-dark-500);
+}
+
+.at-ruler-label {
+    font-size: 9px;
+    color: var(--color-neutral-400);
+    margin-top: 1px;
+    white-space: nowrap;
+}
+
+/* ─── Tracks list ─── */
+.at-tracks-list {
+    max-height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.at-tracks-list::-webkit-scrollbar { width: 6px; }
+.at-tracks-list::-webkit-scrollbar-track { background: var(--color-dark-900); }
+.at-tracks-list::-webkit-scrollbar-thumb { background: var(--color-dark-500); border-radius: 3px; }
+
+/* ─── Track row ─── */
+.at-track-row {
+    display: flex;
+    align-items: stretch;
+    height: 46px;
+    border-bottom: 1px solid var(--color-dark-700);
+}
+
+.at-track-row:last-child { border-bottom: none; }
+
+/* ─── Track controls (left strip) ─── */
+.at-track-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 220px;
+    min-width: 220px;
+    padding: 0 6px;
+    background: var(--color-dark-800);
+    border-right: 1px solid var(--color-dark-600);
+    flex-shrink: 0;
+}
+
+.at-color-swatch {
+    width: 6px;
+    height: 28px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.at-track-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--color-neutral-200);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: text;
+    padding: 2px 3px;
+    border-radius: var(--radius-sm);
+    outline: none;
+}
+
+.at-track-name:focus {
+    background: var(--color-dark-700);
+    color: #fff;
+    white-space: normal;
+}
+
+/* ─── Control buttons ─── */
+.at-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 3px;
+    border-radius: var(--radius-sm);
+    line-height: 1;
+    flex-shrink: 0;
+    opacity: 0.75;
+    transition: opacity 0.15s, background 0.15s;
+}
+
+.at-btn:hover { opacity: 1; background: var(--color-dark-600); }
+
+.at-mute-btn.muted { opacity: 0.45; }
+
+.at-rec-btn { color: #e74c3c; }
+
+.at-rec-btn.recording {
+    color: #e74c3c;
+    opacity: 1;
+    animation: at-pulse 0.8s infinite;
+}
+
+@keyframes at-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.35; }
+}
+
+.at-del-btn { color: var(--color-neutral-400); font-size: 15px; }
+.at-del-btn:hover { color: var(--color-danger); }
+
+/* ─── Volume slider ─── */
+.at-vol-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 44px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-dark-500);
+    outline: none;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.at-vol-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-neutral-300);
+    cursor: pointer;
+}
+
+/* ─── Track timeline (right area) ─── */
+.at-track-timeline {
+    flex: 1;
+    position: relative;
+    background: var(--color-dark-900);
+    overflow: hidden;
+    cursor: default;
+}
+
+.at-track-timeline.drag-over {
+    background: rgba(49, 162, 242, 0.12);
+    outline: 1px dashed var(--color-primary-blue);
+    outline-offset: -1px;
+}
+
+/* ─── Audio clip block ─── */
+.at-clip {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 4px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    min-width: 6px;
+    opacity: 0.88;
+    transition: opacity 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.at-clip:hover { opacity: 1; }
+.at-clip:active { cursor: grabbing; }
+
+.at-waveform {
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+}
+
+/* ─── Empty track hint ─── */
+.at-empty-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--color-dark-500);
+    pointer-events: none;
+    letter-spacing: 0.2px;
+}
+
+/* ─── Drop hint (no tracks yet) ─── */
+.at-drop-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 52px;
+    color: var(--color-dark-500);
+    font-size: 12px;
+    border: 1px dashed var(--color-dark-600);
+    border-radius: var(--radius-sm);
+    margin: 8px;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.at-drop-hint:hover,
+.at-panel-body.drag-over .at-drop-hint {
+    border-color: var(--color-primary-blue);
+    color: var(--color-primary-blue);
+}
